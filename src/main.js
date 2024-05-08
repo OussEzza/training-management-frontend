@@ -3,6 +3,7 @@ import App from "./App.vue";
 import Index from "./components/TrainingView.vue";
 import Edit from "./components/EditTraining.vue";
 import Login from "./components/AuthView.vue";
+import DashBoard from "./components/DashBoard.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
@@ -10,6 +11,11 @@ const routes = [
     name: "Login",
     path: "/login",
     component: Login,
+  },
+  {
+    name: "DashBoard",
+    path: "/",
+    component: DashBoard,
   },
   {
     name: "Index",
