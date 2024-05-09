@@ -2,7 +2,7 @@
   <div class="container mt-4">
     <h2 class="text-center mb-4">Dashboard</h2>
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-4">
         <router-link to="/agents" class="card-link">
           <div class="card primary">
             <div class="card-body">
@@ -12,7 +12,7 @@
           </div>
         </router-link>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
         <router-link to="/trainings" class="card-link">
           <div class="card success">
             <div class="card-body">
@@ -22,9 +22,22 @@
           </div>
         </router-link>
       </div>
+      <div class="col-md-4">
+        <router-link to="/agent-training" class="card-link">
+          <div class="card info">
+            <div class="card-body">
+              <h5 class="card-title">Total Agent in Training</h5>
+              <p class="card-text">{{ agentTrainingCount }}</p>
+            </div>
+          </div>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
+
+
+
 
 <script>
 import axios from "axios";
@@ -35,6 +48,7 @@ export default {
     return {
       agentCount: 0,
       trainingCount: 0,
+      agentTrainingCount: 0,
     };
   },
   created() {
@@ -53,6 +67,10 @@ export default {
         );
         this.trainingCount = trainingResponse.data.trainings.length;
 
+        const agentTrainingResponse = await axios.get(
+          "http://127.0.0.1:8000/api/agent-training"
+        );
+        this.agentTrainingCount = agentTrainingResponse.data.agent_training.length;
       } catch (error) {
         console.log(error);
       }
@@ -60,6 +78,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .card-link {
@@ -103,4 +122,8 @@ export default {
   color: #fff;
 }
 
+.info {
+  background-color: #17a2b8;
+  color: #fff;
+}
 </style>
