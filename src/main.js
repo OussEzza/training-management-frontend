@@ -17,27 +17,49 @@ const routes = [
     name: "DashBoard",
     path: "/",
     component: DashBoard,
+    meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
   {
     name: "Index",
     path: "/trainings",
     component: Index,
+    meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
   {
     name: "Edit",
     path: "/trainings/edit/:id",
     component: Edit,
+    meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
   {
     name: "IndexAgent",
     path: "/agents",
     component: IndexAgent,
+    meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+// Route guard
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem("token") !== null;
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    // Check if route requires authentication
+    if (!isAuthenticated) {
+      // User is not authenticated, redirect to login page
+      next({ name: "Login" });
+    } else {
+      // User is authenticated, proceed to the route
+      next();
+    }
+  } else {
+    // If the route doesn't require authentication, proceed as normal
+    next();
+  }
 });
 
 createApp(App).use(router).mount("#app");

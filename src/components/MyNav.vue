@@ -1,6 +1,5 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <!-- Navbar content -->
     <div class="container-fluid">
       <router-link class="navbar-brand text-light" to="/">Navbar</router-link>
       <button
@@ -49,6 +48,11 @@
               >AssignAgentToTraining</router-link
             >
           </li>
+          <li class="nav-item">
+            <button @click="logout" class="btn btn-outline-light">
+              Logout
+            </button>
+          </li>
         </ul>
         <form class="d-flex" role="search">
           <input
@@ -63,6 +67,38 @@
     </div>
   </nav>
 </template>
+
+<script>
+import axios from "axios";
+
+export default {
+  methods: {
+    async logout() {
+      try {
+        await axios.post("http://127.0.0.1:8000/api/logout", null, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        // Remove the token from local storage
+        localStorage.removeItem("token");
+        // Optionally, you can also remove user data if stored
+        localStorage.removeItem("user");
+        this.$router.push("/login");
+        console.log("logout completed");
+      } catch (error) {
+        console.error("Logout error:", error.response.data);
+      }
+    },
+  },
+};
+</script>
+
+<style>
+.navbar-nav .btn-logout {
+  margin-left: 10px;
+}
+</style>
 
 <!-- <style>
 /* Add custom styles for the active link */

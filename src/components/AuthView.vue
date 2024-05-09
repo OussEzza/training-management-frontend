@@ -74,14 +74,15 @@ export default {
         return;
       }
 
-      // If no errors, proceed with login
       try {
         const response = await axios.post("http://127.0.0.1:8000/api/login", {
           email: this.loginData.email,
           password: this.loginData.password,
         });
-        console.log(response.data);
-        // Store the token in local storage or cookies
+        const { user, token } = response.data;
+        localStorage.setItem("token", token);
+        // Optionally, you can also store user data in local storage if needed
+        localStorage.setItem("user", JSON.stringify(user));
         this.$router.push("/");
       } catch (error) {
         console.error("Login error:", error.response.data);
