@@ -62,13 +62,12 @@
               <td>{{ agent.service }}</td>
               <td>{{ agent.function }}</td>
               <td>
-                <!-- Router link for editing agent -->
-                <!-- <router-link
+                <router-link
                   :to="{ name: 'EditAgent', params: { id: agent.id } }"
                   class="btn btn-sm btn-primary me-1"
                 >
                   Edit
-                </router-link> -->
+                </router-link>
                 <button
                   class="btn btn-sm btn-danger"
                   @click="deleteAgent(agent.id)"
@@ -78,7 +77,10 @@
               </td>
               <td>
                 <router-link
-                  :to="{ name: 'ViewAssignedTraining', params: { id: agent.id } }"
+                  :to="{
+                    name: 'ViewAssignedTraining',
+                    params: { id: agent.id },
+                  }"
                   class="btn btn-sm btn-primary me-1"
                 >
                   View
