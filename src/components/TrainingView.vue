@@ -60,10 +60,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="(training, index) in filteredTrainingsList"
-          :key="training.id"
-        >
+        <tr v-for="(training, index) in currentPageItems" :key="training.id">
           <td>{{ index + 1 }}</td>
           <td>{{ training.name }}</td>
           <td>{{ training.duration }}</td>
@@ -171,6 +168,26 @@
         </div>
       </div>
     </div>
+    <nav aria-label="Page navigation example" class="m-3">
+      <ul class="pagination justify-content-end">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <button class="page-link" @click="prevPage">Previous</button>
+        </li>
+        <li
+          class="page-item"
+          v-for="page in totalPages"
+          :key="page"
+          :class="{ active: page === currentPage }"
+        >
+          <button class="page-link" @click="changePage(page)">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <button class="page-link" @click="nextPage">Next</button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -190,6 +207,8 @@ export default {
         duration: "",
         category: "",
       },
+      currentPage: 1,
+      pageSize: 2,
     };
   },
   computed: {
@@ -210,6 +229,24 @@ export default {
             this.selectedCategory.toLowerCase();
         return isMatchingName && isSelectedCategory && isMatchingDuration;
       });
+    },
+    totalPages() {
+      return Math.ceil(this.filteredTrainingsList.length / this.pageSize);
+    },
+    startIndex() {
+      return (this.currentPage - 1) * this.pageSize;
+    },
+    endIndex() {
+      return Math.min(
+        this.startIndex + this.pageSize - 1,
+        this.filteredTrainingsList.length - 1
+      );
+    },
+    currentPageItems() {
+      return this.filteredTrainingsList.slice(
+        this.startIndex,
+        this.endIndex + 1
+      );
     },
   },
 
@@ -249,6 +286,19 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    changePage(page) {
+      this.currentPage = page;
     },
   },
 };
