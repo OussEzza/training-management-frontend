@@ -56,6 +56,7 @@
           <th>Duration</th>
           <th>Category</th>
           <th>Actions</th>
+          <th>View</th>
         </tr>
       </thead>
       <tbody>
@@ -81,10 +82,18 @@
               Delete
             </button>
           </td>
+          <td>
+            <!-- Router link for editing agent -->
+            <router-link
+              :to="{ name: 'ViewAssigned', params: { id: training.id } }"
+              class="btn btn-sm btn-primary me-1"
+            >
+              View
+            </router-link>
+          </td>
         </tr>
       </tbody>
     </table>
-
 
     <div class="text-end mt-3">
       <button

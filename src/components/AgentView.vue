@@ -51,7 +51,6 @@
               <th>Name</th>
               <th>Service</th>
               <th>Function</th>
-              <th>Department</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -61,15 +60,14 @@
               <td>{{ agent.name }}</td>
               <td>{{ agent.service }}</td>
               <td>{{ agent.function }}</td>
-              <td>{{ agent.department }}</td>
               <td>
                 <!-- Router link for editing agent -->
-                <router-link
+                <!-- <router-link
                   :to="{ name: 'EditAgent', params: { id: agent.id } }"
                   class="btn btn-sm btn-primary me-1"
                 >
                   Edit
-                </router-link>
+                </router-link> -->
                 <button
                   class="btn btn-sm btn-danger"
                   @click="deleteAgent(agent.id)"
