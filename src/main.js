@@ -4,6 +4,7 @@ import Index from "./components/TrainingView.vue";
 import Edit from "./components/EditTraining.vue";
 import Login from "./components/AuthView.vue";
 import DashBoard from "./components/DashBoard.vue";
+import IndexAgent from "./components/AgentView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
@@ -26,6 +27,11 @@ const routes = [
     name: "Edit",
     path: "/trainings/edit/:id",
     component: Edit,
+  },
+  {
+    name: "IndexAgent",
+    path: "/agents",
+    component: IndexAgent,
   },
 ];
 
