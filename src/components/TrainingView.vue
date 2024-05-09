@@ -83,9 +83,8 @@
             </button>
           </td>
           <td>
-            <!-- Router link for editing agent -->
             <router-link
-              :to="{ name: 'ViewAssigned', params: { id: training.id } }"
+              :to="{ name: 'ViewAssignedAgent', params: { id: training.id } }"
               class="btn btn-sm btn-primary me-1"
             >
               View

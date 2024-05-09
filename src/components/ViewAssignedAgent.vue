@@ -6,20 +6,20 @@
           <thead class="table-dark">
             <tr>
               <th scope="col">#</th>
+              <th scope="col">Training</th>
               <th scope="col">Agent</th>
               <th scope="col">Service</th>
               <th scope="col">Function</th>
-              <th scope="col">Training</th>
               <th scope="col">Date</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(record, index) in agent_training" :key="record.id">
               <td>{{ index + 1 }}</td>
+              <td>{{ getTrainingName(record.training_id) }}</td>
               <td>{{ getAgentName(record.agent_id) }}</td>
               <td>{{ getAgentService(record.agent_id) }}</td>
               <td>{{ getAgentFunction(record.agent_id) }}</td>
-              <td>{{ getTrainingName(record.training_id) }}</td>
               <td>{{ record.date }}</td>
             </tr>
           </tbody>

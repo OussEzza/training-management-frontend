@@ -52,6 +52,7 @@
               <th>Service</th>
               <th>Function</th>
               <th>Actions</th>
+              <th>View</th>
             </tr>
           </thead>
           <tbody>
@@ -74,6 +75,14 @@
                 >
                   Delete
                 </button>
+              </td>
+              <td>
+                <router-link
+                  :to="{ name: 'ViewAssignedTraining', params: { id: agent.id } }"
+                  class="btn btn-sm btn-primary me-1"
+                >
+                  View
+                </router-link>
               </td>
             </tr>
           </tbody>

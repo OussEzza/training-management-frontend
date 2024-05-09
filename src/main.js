@@ -5,7 +5,8 @@ import Edit from "./components/EditTraining.vue";
 import Login from "./components/AuthView.vue";
 import DashBoard from "./components/DashBoard.vue";
 import IndexAgent from "./components/AgentView.vue";
-import ViewAssigned from "./components/ViewAssigned.vue";
+import ViewAssignedAgent from "./components/ViewAssignedAgent.vue";
+import ViewAssignedTraining from "./components/ViewAssignedTraining.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
@@ -33,9 +34,15 @@ const routes = [
     meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
   {
-    name: "ViewAssigned",
+    name: "ViewAssignedAgent",
     path: "/trainings/view/:id",
-    component: ViewAssigned,
+    component: ViewAssignedAgent,
+    meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
+  },
+  {
+    name: "ViewAssignedTraining",
+    path: "/agents/view/:id",
+    component: ViewAssignedTraining,
     meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
   {
