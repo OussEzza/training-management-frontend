@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="">
-    <TheNav></TheNav>
+    <TheNav v-if="showNavbar"></TheNav>
     <router-view />
   </div>
 </template>
@@ -12,6 +12,25 @@ export default {
   name: "App",
   components: {
     TheNav,
+  },
+  data() {
+    return {
+      showNavbar: true,
+    };
+  },
+  watch: {
+    $route(to, from) {
+      this.updateNavbarVisibility(to.path);
+      console.log(from);
+    },
+  },
+  created() {
+    this.updateNavbarVisibility(this.$route.path);
+  },
+  methods: {
+    updateNavbarVisibility(path) {
+      this.showNavbar = !['/login'].includes(path);
+    },
   },
 };
 </script>

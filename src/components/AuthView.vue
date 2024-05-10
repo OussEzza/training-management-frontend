@@ -3,7 +3,7 @@
     <img
       src="../assets/logo.png"
       alt="Login Image"
-      class="img-fluid rounded mx-auto d-block mb-4"
+      class="img-fluid rounded mx-auto d-block mb-4 mt-5"
       style="height: 200px"
     />
     <h1>Login</h1>
@@ -55,13 +55,11 @@ export default {
   },
   methods: {
     async login() {
-      // Reset errors
       this.errors = {
         email: null,
         password: null,
       };
 
-      // Perform validation
       if (!this.loginData.email) {
         this.errors.email = "Email is required";
       }
@@ -69,7 +67,6 @@ export default {
         this.errors.password = "Password is required";
       }
 
-      // If there are errors, stop login process
       if (this.errors.email || this.errors.password) {
         return;
       }
@@ -81,7 +78,6 @@ export default {
         });
         const { user, token } = response.data;
         localStorage.setItem("token", token);
-        // Optionally, you can also store user data in local storage if needed
         localStorage.setItem("user", JSON.stringify(user));
         this.$router.push("/");
       } catch (error) {
