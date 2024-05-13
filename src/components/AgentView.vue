@@ -56,8 +56,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(agent, index) in filteredAgentsList" :key="agent.id">
-              <td>{{ index + 1 }}</td>
+            <tr v-for="(agent, index) in paginatedAgents" :key="agent.id">
+              <td>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
               <td>{{ agent.name }}</td>
               <td>{{ agent.service }}</td>
               <td>{{ agent.function }}</td>
@@ -89,6 +89,27 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Pagination Section -->
+        <div class="text-center mt-3">
+          <button
+            type="button"
+            class="btn btn-primary me-2"
+            :disabled="currentPage === 1"
+            @click="currentPage -= 1"
+          >
+            Previous
+          </button>
+          <span>{{ currentPage }} / {{ totalPages }}</span>
+          <button
+            type="button"
+            class="btn btn-primary ms-2"
+            :disabled="currentPage === totalPages"
+            @click="currentPage += 1"
+          >
+            Next
+          </button>
+        </div>
 
         <!-- Add New Agent Form -->
         <div class="text-end mt-3">
@@ -179,13 +200,6 @@
         </div>
       </div>
     </div>
-    <div v-if="errorGetAgents" class="alert alert-danger mt-3" role="alert">
-      {{ errorGetAgents }}
-    </div>
-
-    <div v-if="errorDeleteAgent" class="alert alert-danger mt-3" role="alert">
-      {{ errorDeleteAgent }}
-    </div>
   </div>
 </template>
 
@@ -206,9 +220,19 @@ export default {
       errorGetAgents: "",
       errorDeleteAgent: "",
       errorAddAgent: "",
+      currentPage: 1,
+      itemsPerPage: 3,
     };
   },
   computed: {
+    totalPages() {
+      return Math.ceil(this.filteredAgentsList.length / this.itemsPerPage);
+    },
+    paginatedAgents() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.filteredAgentsList.slice(startIndex, endIndex);
+    },
     filteredAgentsList() {
       return this.agents.filter((agent) => {
         const isMatchingName = agent.name
@@ -242,7 +266,6 @@ export default {
         console.log(error);
       }
     },
-
     async deleteAgent(id) {
       try {
         await axios.delete(`http://127.0.0.1:8000/api/agents/${id}`);
