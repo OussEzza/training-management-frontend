@@ -56,8 +56,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(agent, index) in paginatedAgents" :key="agent.id">
-              <td>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
+            <tr v-for="(agent, index) in currentPageItems" :key="agent.id">
+              <td>{{ index + 1 }}</td>
               <td>{{ agent.name }}</td>
               <td>{{ agent.service }}</td>
               <td>{{ agent.function }}</td>
@@ -89,27 +89,6 @@
             </tr>
           </tbody>
         </table>
-
-        <!-- Pagination Section -->
-        <div class="text-center mt-3">
-          <button
-            type="button"
-            class="btn btn-primary me-2"
-            :disabled="currentPage === 1"
-            @click="currentPage -= 1"
-          >
-            Previous
-          </button>
-          <span>{{ currentPage }} / {{ totalPages }}</span>
-          <button
-            type="button"
-            class="btn btn-primary ms-2"
-            :disabled="currentPage === totalPages"
-            @click="currentPage += 1"
-          >
-            Next
-          </button>
-        </div>
 
         <!-- Add New Agent Form -->
         <div class="text-end mt-3">
@@ -198,21 +177,36 @@
             </div>
           </div>
         </div>
-        <div
-          v-if="errorGetAgents"
-          class="alert alert-danger mt-3"
-          role="alert"
-        >
-          {{ errorGetAgents }}
-        </div>
+      </div>
+      <nav aria-label="Page navigation example" class="m-3">
+        <ul class="pagination justify-content-end">
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <button class="page-link" @click="prevPage">Previous</button>
+          </li>
+          <li
+            class="page-item"
+            v-for="page in totalPages"
+            :key="page"
+            :class="{ active: page === currentPage }"
+          >
+            <button class="page-link" @click="changePage(page)">
+              {{ page }}
+            </button>
+          </li>
+          <li
+            class="page-item"
+            :class="{ disabled: currentPage === totalPages }"
+          >
+            <button class="page-link" @click="nextPage">Next</button>
+          </li>
+        </ul>
+      </nav>
+      <div v-if="errorGetAgents" class="alert alert-danger mt-3" role="alert">
+        {{ errorGetAgents }}
+      </div>
 
-        <div
-          v-if="errorDeleteAgent"
-          class="alert alert-danger mt-3"
-          role="alert"
-        >
-          {{ errorDeleteAgent }}
-        </div>
+      <div v-if="errorDeleteAgent" class="alert alert-danger mt-3" role="alert">
+        {{ errorDeleteAgent }}
       </div>
     </div>
   </div>
@@ -236,18 +230,10 @@ export default {
       errorDeleteAgent: "",
       errorAddAgent: "",
       currentPage: 1,
-      itemsPerPage: 3,
+      pageSize: 2,
     };
   },
   computed: {
-    totalPages() {
-      return Math.ceil(this.filteredAgentsList.length / this.itemsPerPage);
-    },
-    paginatedAgents() {
-      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      return this.filteredAgentsList.slice(startIndex, endIndex);
-    },
     filteredAgentsList() {
       return this.agents.filter((agent) => {
         const isMatchingName = agent.name
@@ -261,6 +247,21 @@ export default {
           .includes(this.searchFunction.toLowerCase());
         return isMatchingName && isMatchingService && isMatchingFunction;
       });
+    },
+    totalPages() {
+      return Math.ceil(this.filteredAgentsList.length / this.pageSize);
+    },
+    startIndex() {
+      return (this.currentPage - 1) * this.pageSize;
+    },
+    endIndex() {
+      return Math.min(
+        this.startIndex + this.pageSize - 1,
+        this.filteredAgentsList.length - 1
+      );
+    },
+    currentPageItems() {
+      return this.filteredAgentsList.slice(this.startIndex, this.endIndex + 1);
     },
   },
   created() {
@@ -310,6 +311,19 @@ export default {
           : "Failed to add agent";
         console.log(error);
       }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    changePage(page) {
+      this.currentPage = page;
     },
   },
 };

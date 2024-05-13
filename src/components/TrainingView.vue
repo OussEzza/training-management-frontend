@@ -60,7 +60,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(training, index) in paginatedTrainings" :key="training.id">
+        <tr v-for="(training, index) in currentPageItems" :key="training.id">
           <td>{{ index + 1 }}</td>
           <td>{{ training.name }}</td>
           <td>{{ training.duration }}</td>
@@ -91,27 +91,6 @@
       </tbody>
     </table>
 
-    <!-- Pagination Section -->
-    <div class="text-center mt-3">
-      <button
-        type="button"
-        class="btn btn-primary me-2"
-        :disabled="currentPage === 1"
-        @click="currentPage -= 1"
-      >
-        Previous
-      </button>
-      <span>{{ currentPage }} / {{ totalPages }}</span>
-      <button
-        type="button"
-        class="btn btn-primary ms-2"
-        :disabled="currentPage === totalPages"
-        @click="currentPage += 1"
-      >
-        Next
-      </button>
-    </div>
-
     <div class="text-end mt-3">
       <button
         type="button"
@@ -123,7 +102,6 @@
       </button>
     </div>
 
-    <!-- Add Training Modal -->
     <div
       class="modal fade"
       id="addTrainingModal"
@@ -198,7 +176,26 @@
         </div>
       </div>
     </div>
-
+    <nav aria-label="Page navigation example" class="m-3">
+      <ul class="pagination justify-content-end">
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <button class="page-link" @click="prevPage">Previous</button>
+        </li>
+        <li
+          class="page-item"
+          v-for="page in totalPages"
+          :key="page"
+          :class="{ active: page === currentPage }"
+        >
+          <button class="page-link" @click="changePage(page)">
+            {{ page }}
+          </button>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <button class="page-link" @click="nextPage">Next</button>
+        </li>
+      </ul>
+    </nav>
     <!-- Error Alert for Get Trainings -->
     <div v-if="errorGetTrainings" class="alert alert-danger mt-3" role="alert">
       {{ errorGetTrainings }}
@@ -231,11 +228,11 @@ export default {
         duration: "",
         category: "",
       },
+      currentPage: 1,
+      pageSize: 2,
       errorGetTrainings: "",
       errorDeleteTraining: "",
       errorAddTraining: "",
-      currentPage: 1,
-      itemsPerPage: 3,
     };
   },
   computed: {
@@ -258,12 +255,22 @@ export default {
       });
     },
     totalPages() {
-      return Math.ceil(this.filteredTrainingsList.length / this.itemsPerPage);
+      return Math.ceil(this.filteredTrainingsList.length / this.pageSize);
     },
-    paginatedTrainings() {
-      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      return this.filteredTrainingsList.slice(startIndex, endIndex);
+    startIndex() {
+      return (this.currentPage - 1) * this.pageSize;
+    },
+    endIndex() {
+      return Math.min(
+        this.startIndex + this.pageSize - 1,
+        this.filteredTrainingsList.length - 1
+      );
+    },
+    currentPageItems() {
+      return this.filteredTrainingsList.slice(
+        this.startIndex,
+        this.endIndex + 1
+      );
     },
   },
 
@@ -314,6 +321,19 @@ export default {
           : "Failed to add training";
         console.log(error);
       }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    changePage(page) {
+      this.currentPage = page;
     },
   },
 };
