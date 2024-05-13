@@ -166,19 +166,25 @@
                 <button type="button" class="btn btn-primary" @click="addAgent">
                   Save changes
                 </button>
-              </div>
-              <!-- Error Alert -->
-              <div v-if="errorAdd" class="alert alert-danger mt-3" role="alert">
-                {{ errorAdd }}
+                <div
+                  v-if="errorAddAgent"
+                  class="alert alert-danger mt-3"
+                  role="alert"
+                >
+                  {{ errorAddAgent }}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Error Alert -->
-    <div v-if="error" class="alert alert-danger mt-3" role="alert">
-      {{ error }}
+    <div v-if="errorGetAgents" class="alert alert-danger mt-3" role="alert">
+      {{ errorGetAgents }}
+    </div>
+
+    <div v-if="errorDeleteAgent" class="alert alert-danger mt-3" role="alert">
+      {{ errorDeleteAgent }}
     </div>
   </div>
 </template>
@@ -197,8 +203,9 @@ export default {
       searchName: "",
       searchService: "",
       searchFunction: "",
-      error: "",
-      errorAdd: "",
+      errorGetAgents: "",
+      errorDeleteAgent: "",
+      errorAddAgent: "",
     };
   },
   computed: {
@@ -226,14 +233,12 @@ export default {
         const response = await axios.get("http://127.0.0.1:8000/api/agents");
         if (response.data && response.data.agents) {
           this.agents = response.data.agents;
-          this.error = "";
+          this.errorGetAgents = "";
         } else {
-          this.error = "No data available";
+          this.errorGetAgents = "No data available";
         }
       } catch (error) {
-        this.error = error.response
-          ? error.response.data.message
-          : "Server error occurred";
+        this.errorGetAgents = "Failed to fetch agents";
         console.log(error);
       }
     },
@@ -242,7 +247,9 @@ export default {
       try {
         await axios.delete(`http://127.0.0.1:8000/api/agents/${id}`);
         this.getAgents();
+        this.errorDeleteAgent = "";
       } catch (error) {
+        this.errorDeleteAgent = "Failed to delete agent";
         console.log(error);
       }
     },
@@ -252,18 +259,17 @@ export default {
           name: this.name,
           service: this.service,
           function: this.func,
-          department: this.dept,
         });
         this.name = "";
         this.service = "";
         this.func = "";
-        this.dept = "";
         this.errorAdd = "";
+        this.errorAddAgent = "";
         this.getAgents();
       } catch (error) {
-        this.errorAdd = error.response
+        this.errorAddAgent = error.response
           ? error.response.data.message
-          : "Server error occurred";
+          : "Failed to add agent";
         console.log(error);
       }
     },

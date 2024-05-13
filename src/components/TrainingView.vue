@@ -165,6 +165,14 @@
               Add Training
             </button>
           </div>
+          <!-- Error Alert for Add Training -->
+          <div
+            v-if="errorAddTraining"
+            class="alert alert-danger mt-3"
+            role="alert"
+          >
+            {{ errorAddTraining }}
+          </div>
         </div>
       </div>
     </div>
@@ -188,6 +196,19 @@
         </li>
       </ul>
     </nav>
+    <!-- Error Alert for Get Trainings -->
+    <div v-if="errorGetTrainings" class="alert alert-danger mt-3" role="alert">
+      {{ errorGetTrainings }}
+    </div>
+
+    <!-- Error Alert for Delete Training -->
+    <div
+      v-if="errorDeleteTraining"
+      class="alert alert-danger mt-3"
+      role="alert"
+    >
+      {{ errorDeleteTraining }}
+    </div>
   </div>
 </template>
 
@@ -209,6 +230,9 @@ export default {
       },
       currentPage: 1,
       pageSize: 2,
+      errorGetTrainings: "",
+      errorDeleteTraining: "",
+      errorAddTraining: "",
     };
   },
   computed: {
@@ -257,8 +281,14 @@ export default {
     async getTrainings() {
       try {
         const response = await axios.get("http://127.0.0.1:8000/api/trainings");
-        this.trainings = response.data.trainings;
+        if (response.data && response.data.trainings) {
+          this.trainings = response.data.trainings;
+          this.errorGetTrainings = "";
+        } else {
+          this.errorGetTrainings = "No data available";
+        }
       } catch (error) {
+        this.errorGetTrainings = "Failed to fetch trainings";
         console.log(error);
       }
     },
@@ -267,7 +297,9 @@ export default {
       try {
         await axios.delete(`http://127.0.0.1:8000/api/trainings/${id}`);
         this.getTrainings();
+        this.errorDeleteTraining = "";
       } catch (error) {
+        this.errorDeleteTraining = "Failed to delete training";
         console.log(error);
       }
     },
@@ -281,13 +313,16 @@ export default {
         this.training.name = "";
         this.training.duration = "";
         this.training.category = "";
-        this.$router.push("/trainings");
+        this.errorAddTraining = "";
         this.getTrainings();
       } catch (error) {
+        this.errorAddTraining = error.response
+          ? error.response.data.message
+          : "Failed to add training";
         console.log(error);
       }
     },
-    prevPage() {
+    age() {
       if (this.currentPage > 1) {
         this.currentPage--;
       }
