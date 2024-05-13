@@ -167,10 +167,18 @@
                   Save changes
                 </button>
               </div>
+              <!-- Error Alert -->
+              <div v-if="errorAdd" class="alert alert-danger mt-3" role="alert">
+                {{ errorAdd }}
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <!-- Error Alert -->
+    <div v-if="error" class="alert alert-danger mt-3" role="alert">
+      {{ error }}
     </div>
   </div>
 </template>
@@ -189,6 +197,8 @@ export default {
       searchName: "",
       searchService: "",
       searchFunction: "",
+      error: "",
+      errorAdd: "",
     };
   },
   computed: {
@@ -214,11 +224,20 @@ export default {
     async getAgents() {
       try {
         const response = await axios.get("http://127.0.0.1:8000/api/agents");
-        this.agents = response.data.agents;
+        if (response.data && response.data.agents) {
+          this.agents = response.data.agents;
+          this.error = "";
+        } else {
+          this.error = "No data available";
+        }
       } catch (error) {
+        this.error = error.response
+          ? error.response.data.message
+          : "Server error occurred";
         console.log(error);
       }
     },
+
     async deleteAgent(id) {
       try {
         await axios.delete(`http://127.0.0.1:8000/api/agents/${id}`);
@@ -239,8 +258,12 @@ export default {
         this.service = "";
         this.func = "";
         this.dept = "";
+        this.errorAdd = "";
         this.getAgents();
       } catch (error) {
+        this.errorAdd = error.response
+          ? error.response.data.message
+          : "Server error occurred";
         console.log(error);
       }
     },
