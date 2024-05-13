@@ -16,6 +16,7 @@
           id="exampleInputEmail1"
           aria-describedby="emailHelp"
           v-model="loginData.email"
+          @input="clearError('email')"
         />
         <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
       </div>
@@ -26,6 +27,7 @@
           class="form-control"
           id="exampleInputPassword1"
           v-model="loginData.password"
+          @input="clearError('password')"
         />
         <div v-if="errors.password" class="text-danger">
           {{ errors.password }}
@@ -55,10 +57,7 @@ export default {
   },
   methods: {
     async login() {
-      this.errors = {
-        email: null,
-        password: null,
-      };
+      this.clearErrors();
 
       if (!this.loginData.email) {
         this.errors.email = "Email is required";
@@ -81,13 +80,33 @@ export default {
         localStorage.setItem("user", JSON.stringify(user));
         this.$router.push("/");
       } catch (error) {
-        console.error("Login error:", error.response.data);
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.errors
+        ) {
+          if (error.response.data.errors.email) {
+            this.errors.email = error.response.data.errors.email;
+          }
+          if (error.response.data.errors.password) {
+            this.errors.password = error.response.data.errors.password;
+          }
+        } else {
+          console.error("Login error:", error.response.data);
+          alert("An error occurred during login. Please try again.");
+        }
       }
+    },
+    clearError(field) {
+      if (Object.prototype.hasOwnProperty.call(this.errors, field)) {
+        this.errors[field] = null;
+      }
+    },
+    clearErrors() {
+      Object.keys(this.errors).forEach((key) => {
+        this.errors[key] = null;
+      });
     },
   },
 };
 </script>
-
-<style scoped>
-/* Add your custom styles here */
-</style>
