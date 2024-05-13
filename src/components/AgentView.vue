@@ -187,16 +187,31 @@
                 <button type="button" class="btn btn-primary" @click="addAgent">
                   Save changes
                 </button>
-                <div
-                  v-if="errorAddAgent"
-                  class="alert alert-danger mt-3"
-                  role="alert"
-                >
-                  {{ errorAddAgent }}
-                </div>
+              </div>
+              <div
+                v-if="errorAddAgent"
+                class="alert alert-danger mt-3"
+                role="alert"
+              >
+                {{ errorAddAgent }}
               </div>
             </div>
           </div>
+        </div>
+        <div
+          v-if="errorGetAgents"
+          class="alert alert-danger mt-3"
+          role="alert"
+        >
+          {{ errorGetAgents }}
+        </div>
+
+        <div
+          v-if="errorDeleteAgent"
+          class="alert alert-danger mt-3"
+          role="alert"
+        >
+          {{ errorDeleteAgent }}
         </div>
       </div>
     </div>
