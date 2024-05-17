@@ -174,7 +174,7 @@ export default {
           this.trainingId = "";
           this.date = "";
           console.log("Response:", response.data);
-          this.showModal = false;
+          // this.showModal = false;
           this.getAgentTraining();
           this.messageAssignAgentToTraining =
             "Agent assigned to training successfully";

@@ -49,6 +49,7 @@
             <tr>
               <th>#</th>
               <th>Name</th>
+              <th>Email</th>
               <th>Service</th>
               <th>Function</th>
               <th>Actions</th>
@@ -59,6 +60,7 @@
             <tr v-for="(agent, index) in currentPageItems" :key="agent.id">
               <td>{{ index + 1 }}</td>
               <td>{{ agent.name }}</td>
+              <td>{{ agent.email }}</td>
               <td>{{ agent.service }}</td>
               <td>{{ agent.function }}</td>
               <td>
@@ -132,6 +134,29 @@
                     placeholder="Enter name"
                   />
                 </div>
+                <div class="mb-3">
+                  <label for="inputEmail" class="form-label">Email:</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="inputEmail"
+                    v-model="email"
+                    placeholder="Enter email"
+                    :class="{ 'is-invalid': emailError }"
+                  />
+                  <div v-if="emailError" class="invalid-feedback">
+                    {{ emailError }}
+                  </div>
+                </div>
+                <!-- Validation for email -->
+                <div
+                  v-if="emailError"
+                  class="alert alert-danger mt-3"
+                  role="alert"
+                >
+                  {{ emailError }}
+                </div>
+                <!-- End of email validation -->
                 <div class="mb-3">
                   <label for="inputService" class="form-label">Service:</label>
                   <input
@@ -221,11 +246,13 @@ export default {
     return {
       agents: [],
       name: "",
+      email: "",
       service: "",
       func: "",
       searchName: "",
       searchService: "",
       searchFunction: "",
+      emailError: "",
       errorGetAgents: "",
       errorDeleteAgent: "",
       errorAddAgent: "",
@@ -294,17 +321,38 @@ export default {
     },
     async addAgent() {
       try {
-        await axios.post("http://127.0.0.1:8000/api/agents", {
-          name: this.name,
-          service: this.service,
-          function: this.func,
-        });
-        this.name = "";
-        this.service = "";
-        this.func = "";
-        this.errorAdd = "";
-        this.errorAddAgent = "";
-        this.getAgents();
+        if (this.name && this.email && this.service && this.func) {
+          if (!this.isValidEmail(this.email)) {
+            this.errorAddAgent = "Invalid email format";
+            return;
+          }
+
+          const emailExists = this.agents.some(
+            (agent) => agent.email === this.email
+          );
+          if (emailExists) {
+            this.errorAddAgent = "Email already exists in the list";
+            return;
+          }
+
+          await axios.post("http://127.0.0.1:8000/api/agents", {
+            name: this.name,
+            email: this.email,
+            service: this.service,
+            function: this.func,
+          });
+
+          this.name = "";
+          this.email = "";
+          this.service = "";
+          this.func = "";
+          this.emailError = "";
+          this.errorAddAgent = "";
+
+          this.getAgents();
+        } else {
+          this.errorAddAgent = "Please fill all the fields";
+        }
       } catch (error) {
         this.errorAddAgent = error.response
           ? error.response.data.message
@@ -312,6 +360,7 @@ export default {
         console.log(error);
       }
     },
+
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
@@ -324,6 +373,10 @@ export default {
     },
     changePage(page) {
       this.currentPage = page;
+    },
+    isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
     },
   },
 };

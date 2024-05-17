@@ -151,15 +151,20 @@
             </div>
             <div class="mb-3">
               <label for="inputCategory" class="form-label">Category:</label>
-              <input
-                type="text"
-                class="form-control"
+              <select
+                class="form-select"
                 id="inputCategory"
-                name="category"
                 v-model="training.category"
-                placeholder="Enter category..."
-                required
-              />
+              >
+                <option value="">All Categories</option>
+                <option
+                  v-for="category in Categories"
+                  :key="category"
+                  :value="category"
+                >
+                  {{ category }}
+                </option>
+              </select>
             </div>
             <button type="button" class="btn btn-primary" @click="saveTraining">
               Add Training
@@ -228,6 +233,7 @@ export default {
         duration: "",
         category: "",
       },
+      Categories: ["Category 1", "Category 2", "Category 3"],
       currentPage: 1,
       pageSize: 2,
       errorGetTrainings: "",
@@ -305,16 +311,24 @@ export default {
     },
     async saveTraining() {
       try {
-        await axios.post("http://127.0.0.1:8000/api/trainings", {
-          name: this.training.name,
-          duration: this.training.duration,
-          category: this.training.category,
-        });
-        this.training.name = "";
-        this.training.duration = "";
-        this.training.category = "";
-        this.errorAddTraining = "";
-        this.getTrainings();
+        if (
+          this.training.name &&
+          this.training.duration &&
+          this.training.category
+        ) {
+          await axios.post("http://127.0.0.1:8000/api/trainings", {
+            name: this.training.name,
+            duration: this.training.duration,
+            category: this.training.category,
+          });
+          this.training.name = "";
+          this.training.duration = "";
+          this.training.category = "";
+          this.errorAddTraining = "";
+          this.getTrainings();
+        } else {
+          this.errorAddTraining = "Please fill all the fields";
+        }
       } catch (error) {
         this.errorAddTraining = error.response
           ? error.response.data.message
