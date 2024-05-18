@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import Index from "./components/TrainingView.vue";
 import Edit from "./components/EditTraining.vue";
+import Register from "./components/RegisterView.vue";
 import Login from "./components/AuthView.vue";
 import DashBoard from "./components/DashBoard.vue";
 import IndexAgent from "./components/AgentView.vue";
@@ -12,6 +13,11 @@ import AssignAgentToTraining from "./components/AssignAgentToTraining.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
+  {
+    name: "Register",
+    path: "/register",
+    component: Register,
+  },
   {
     name: "Login",
     path: "/login",

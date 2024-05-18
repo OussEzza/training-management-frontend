@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     updateNavbarVisibility(path) {
-      this.showNavbar = !['/login'].includes(path);
+      this.showNavbar = !['/login', '/register'].includes(path);
     },
   },
 };
