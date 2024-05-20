@@ -53,7 +53,7 @@
         <tr>
           <th>#</th>
           <th>Training Name</th>
-          <th>Duration</th>
+          <th>Duration per year</th>
           <th>Category</th>
           <th>Actions</th>
           <th>View</th>
@@ -69,12 +69,11 @@
             <router-link
               :to="{ name: 'Edit', params: { id: training.id } }"
               class="btn btn-sm btn-primary me-1"
+              >Edit</router-link
             >
-              Edit
-            </router-link>
             <button
               class="btn btn-sm btn-danger"
-              @click="deleteTraining(training.id)"
+              @click="confirmDeleteTraining(training.id)"
             >
               Delete
             </button>
@@ -83,9 +82,8 @@
             <router-link
               :to="{ name: 'ViewAssignedAgent', params: { id: training.id } }"
               class="btn btn-sm btn-primary me-1"
+              >View</router-link
             >
-              View
-            </router-link>
           </td>
         </tr>
       </tbody>
@@ -134,11 +132,17 @@
                 name="name"
                 v-model="training.name"
                 placeholder="Enter training name..."
+                :class="{ 'is-invalid': trainingNameError }"
                 required
               />
+              <div v-if="trainingNameError" class="invalid-feedback">
+                {{ trainingNameError }}
+              </div>
             </div>
             <div class="mb-3">
-              <label for="inputDuration" class="form-label">Duration:</label>
+              <label for="inputDuration" class="form-label"
+                >Duration per year:</label
+              >
               <input
                 type="text"
                 class="form-control"
@@ -146,8 +150,12 @@
                 name="duration"
                 v-model="training.duration"
                 placeholder="Enter duration..."
+                :class="{ 'is-invalid': trainingDurationError }"
                 required
               />
+              <div v-if="trainingDurationError" class="invalid-feedback">
+                {{ trainingDurationError }}
+              </div>
             </div>
             <div class="mb-3">
               <label for="inputCategory" class="form-label">Category:</label>
@@ -155,8 +163,9 @@
                 class="form-select"
                 id="inputCategory"
                 v-model="training.category"
+                :class="{ 'is-invalid': trainingCategoryError }"
               >
-                <option value="">All Categories</option>
+                <option value="">Select Category</option>
                 <option
                   v-for="category in Categories"
                   :key="category"
@@ -165,12 +174,14 @@
                   {{ category }}
                 </option>
               </select>
+              <div v-if="trainingCategoryError" class="invalid-feedback">
+                {{ trainingCategoryError }}
+              </div>
             </div>
             <button type="button" class="btn btn-primary" @click="saveTraining">
               Add Training
             </button>
           </div>
-          <!-- Error Alert for Add Training -->
           <div
             v-if="errorAddTraining"
             class="alert alert-danger mt-3"
@@ -181,6 +192,7 @@
         </div>
       </div>
     </div>
+
     <nav aria-label="Page navigation example" class="m-3">
       <ul class="pagination justify-content-end">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -201,12 +213,10 @@
         </li>
       </ul>
     </nav>
-    <!-- Error Alert for Get Trainings -->
+
     <div v-if="errorGetTrainings" class="alert alert-danger mt-3" role="alert">
       {{ errorGetTrainings }}
     </div>
-
-    <!-- Error Alert for Delete Training -->
     <div
       v-if="errorDeleteTraining"
       class="alert alert-danger mt-3"
@@ -215,10 +225,77 @@
       {{ errorDeleteTraining }}
     </div>
   </div>
+
+  <!-- Success Toast -->
+  <div
+    class="toast align-items-center bg-success text-white border-0"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+    :class="{ show: showToast }"
+    style="
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+    "
+  >
+    <div class="d-flex">
+      <div class="toast-body">{{ toastMessage }}</div>
+      <button
+        type="button"
+        class="btn-close btn-close-white me-2 m-auto"
+        aria-label="Close"
+        @click="closeToast"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    class="modal"
+    id="deleteConfirmationModal"
+    tabindex="-1"
+    aria-labelledby="deleteConfirmationModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmationModalLabel">
+            Confirm Deletion
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this training?
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" @click="confirmDelete">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
+import * as bootstrap from "bootstrap";
 
 export default {
   name: "TrainingView",
@@ -239,6 +316,12 @@ export default {
       errorGetTrainings: "",
       errorDeleteTraining: "",
       errorAddTraining: "",
+      trainingNameError: "",
+      trainingDurationError: "",
+      trainingCategoryError: "",
+      showToast: false,
+      toastMessage: "",
+      trainingIdToDelete: null,
     };
   },
   computed: {
@@ -279,7 +362,6 @@ export default {
       );
     },
   },
-
   created() {
     this.getTrainings();
   },
@@ -298,24 +380,42 @@ export default {
         console.log(error);
       }
     },
+    confirmDeleteTraining(id) {
+      this.trainingIdToDelete = id;
+      new bootstrap.Modal(
+        document.getElementById("deleteConfirmationModal")
+      ).show();
+    },
+    async confirmDelete() {
+      if (this.trainingIdToDelete !== null) {
+        try {
+          await axios.delete(
+            `http://127.0.0.1:8000/api/trainings/${this.trainingIdToDelete}`
+          );
+          this.trainingIdToDelete = null;
+          this.errorDeleteTraining = "";
+          this.getTrainings();
+          this.showSuccessToast("Training deleted successfully!");
 
-    async deleteTraining(id) {
-      try {
-        await axios.delete(`http://127.0.0.1:8000/api/trainings/${id}`);
-        this.getTrainings();
-        this.errorDeleteTraining = "";
-      } catch (error) {
-        this.errorDeleteTraining = "Failed to delete training";
-        console.log(error);
+          // Hide the confirmation modal using vanilla JavaScript
+          const modal = document.getElementById("deleteConfirmationModal");
+          modal.classList.remove("show");
+          modal.setAttribute("aria-hidden", "true");
+          modal.setAttribute("style", "display: none");
+          document.body.classList.remove("modal-open");
+          const modalBackdrop =
+            document.getElementsByClassName("modal-backdrop");
+          document.body.removeChild(modalBackdrop[0]);
+        } catch (error) {
+          this.errorDeleteTraining = "Failed to delete training";
+          console.log(error);
+        }
       }
     },
+
     async saveTraining() {
       try {
-        if (
-          this.training.name &&
-          this.training.duration &&
-          this.training.category
-        ) {
+        if (this.validateForm()) {
           await axios.post("http://127.0.0.1:8000/api/trainings", {
             name: this.training.name,
             duration: this.training.duration,
@@ -326,8 +426,7 @@ export default {
           this.training.category = "";
           this.errorAddTraining = "";
           this.getTrainings();
-        } else {
-          this.errorAddTraining = "Please fill all the fields";
+          this.showSuccessToast("Training added successfully!");
         }
       } catch (error) {
         this.errorAddTraining = error.response
@@ -335,6 +434,29 @@ export default {
           : "Failed to add training";
         console.log(error);
       }
+    },
+    validateForm() {
+      this.trainingNameError = "";
+      this.trainingDurationError = "";
+      this.trainingCategoryError = "";
+
+      if (!this.training.name) {
+        this.trainingNameError = "Training name is required";
+      }
+
+      if (!this.training.duration) {
+        this.trainingDurationError = "Duration is required";
+      }
+
+      if (!this.training.category) {
+        this.trainingCategoryError = "Category is required";
+      }
+
+      return (
+        !this.trainingNameError &&
+        !this.trainingDurationError &&
+        !this.trainingCategoryError
+      );
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -349,6 +471,48 @@ export default {
     changePage(page) {
       this.currentPage = page;
     },
+    showSuccessToast(message) {
+      this.toastMessage = message;
+      this.showToast = true;
+      setTimeout(() => {
+        this.showToast = false;
+      }, 3000);
+    },
+    closeToast() {
+      this.showToast = false;
+    },
+  },
+  watch: {
+    "training.name"(newName) {
+      if (!newName) {
+        this.trainingNameError = "Training name is required";
+      } else {
+        this.trainingNameError = "";
+      }
+    },
+    "training.duration"(newDuration) {
+      if (!newDuration) {
+        this.trainingDurationError = "Duration is required";
+      } else {
+        this.trainingDurationError = "";
+      }
+    },
+    "training.category"(newCategory) {
+      if (!newCategory) {
+        this.trainingCategoryError = "Category is required";
+      } else {
+        this.trainingCategoryError = "";
+      }
+    },
   },
 };
 </script>
+
+<style scoped>
+.is-invalid {
+  border-color: #dc3545;
+}
+.toast.show {
+  display: block;
+}
+</style>

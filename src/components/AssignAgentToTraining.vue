@@ -17,9 +17,13 @@
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title">Assign Agent to Training</h5>
-                <button type="button" class="close" @click="showModal = false">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  @click="showModal = false"
+                ></button>
               </div>
               <div class="modal-body">
                 <div class="mb-3">
@@ -28,6 +32,7 @@
                     class="form-select"
                     id="selectAgent"
                     v-model="agentId"
+                    :class="{ 'is-invalid': errors.agentId }"
                   >
                     <option value="">Select Agent</option>
                     <option
@@ -38,7 +43,7 @@
                       {{ agent.name }}
                     </option>
                   </select>
-                  <div v-if="errors.agentId" class="text-danger">
+                  <div v-if="errors.agentId" class="invalid-feedback">
                     {{ errors.agentId[0] }}
                   </div>
                 </div>
@@ -50,6 +55,7 @@
                     class="form-select"
                     id="selectTraining"
                     v-model="trainingId"
+                    :class="{ 'is-invalid': errors.trainingId }"
                   >
                     <option value="">Select Training</option>
                     <option
@@ -60,7 +66,7 @@
                       {{ training.name }}
                     </option>
                   </select>
-                  <div v-if="errors.trainingId" class="text-danger">
+                  <div v-if="errors.trainingId" class="invalid-feedback">
                     {{ errors.trainingId[0] }}
                   </div>
                 </div>
@@ -71,8 +77,9 @@
                     class="form-control"
                     id="date"
                     v-model="date"
+                    :class="{ 'is-invalid': errors.date }"
                   />
-                  <div v-if="errors.date" class="text-danger">
+                  <div v-if="errors.date" class="invalid-feedback">
                     {{ errors.date[0] }}
                   </div>
                 </div>
@@ -129,6 +136,35 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Toast component for success message -->
+        <div
+          class="toast align-items-center bg-success text-white border-0"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          :class="{ show: showToast }"
+          style="
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+          "
+        >
+          <div class="d-flex">
+            <div class="toast-body">
+              Agent assigned to training successfully!
+            </div>
+            <button
+              type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+              @click="closeToast"
+            ></button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -149,6 +185,7 @@ export default {
       date: "",
       errors: {},
       showModal: false,
+      showToast: false,
       errorAssignAgentToTraining: "",
       messageAssignAgentToTraining: "",
     };
@@ -161,24 +198,25 @@ export default {
   methods: {
     async assignAgentToTraining() {
       try {
-        if (this.agentId && this.trainingId && this.date) {
-          const response = await axios.post(
-            "http://127.0.0.1:8000/api/agent-training",
-            {
-              agent_id: this.agentId,
-              training_id: this.trainingId,
-              date: this.date,
-            }
-          );
+        if (this.validateForm()) {
+          await axios.post("http://127.0.0.1:8000/api/agent-training", {
+            agent_id: this.agentId,
+            training_id: this.trainingId,
+            date: this.date,
+          });
           this.agentId = "";
           this.trainingId = "";
           this.date = "";
-          console.log("Response:", response.data);
-          // this.showModal = false;
+          this.showModal = false;
           this.getAgentTraining();
+          this.showToast = true;
           this.messageAssignAgentToTraining =
             "Agent assigned to training successfully";
           this.errorAssignAgentToTraining = "";
+
+          setTimeout(() => {
+            this.showToast = false;
+          }, 3000);
         } else {
           this.messageAssignAgentToTraining = "";
           this.errorAssignAgentToTraining = "All fields are required";
@@ -232,6 +270,56 @@ export default {
       );
       return training ? training.name : "";
     },
+    validateForm() {
+      this.errors = {};
+
+      if (!this.agentId) {
+        this.errors.agentId = ["Agent is required"];
+      }
+      if (!this.trainingId) {
+        this.errors.trainingId = ["Training is required"];
+      }
+      if (!this.date) {
+        this.errors.date = ["Date is required"];
+      }
+
+      return Object.keys(this.errors).length === 0;
+    },
+    closeToast() {
+      this.showToast = false;
+    },
+  },
+  watch: {
+    agentId(newAgentId) {
+      if (!newAgentId) {
+        this.errors.agentId = ["Agent is required"];
+      } else {
+        this.errors.agentId = "";
+      }
+    },
+    trainingId(newTrainingId) {
+      if (!newTrainingId) {
+        this.errors.trainingId = ["Training is required"];
+      } else {
+        this.errors.trainingId = "";
+      }
+    },
+    date(newDate) {
+      if (!newDate) {
+        this.errors.date = ["Date is required"];
+      } else {
+        this.errors.date = "";
+      }
+    },
   },
 };
 </script>
+
+<style scoped>
+.is-invalid {
+  border-color: #dc3545;
+}
+.toast {
+  width: 300px;
+}
+</style>
