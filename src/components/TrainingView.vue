@@ -90,22 +90,21 @@
     </table>
 
     <div class="text-end mt-3">
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#addTrainingModal"
-      >
+      <button type="button" class="btn btn-primary" @click="showModal = true">
         Add New Training
       </button>
     </div>
 
+    <!-- Add Training Modal -->
     <div
-      class="modal fade"
+      v-if="showModal"
+      class="modal fade show"
       id="addTrainingModal"
       tabindex="-1"
       aria-labelledby="addTrainingModalLabel"
-      aria-hidden="true"
+      aria-modal="true"
+      role="dialog"
+      style="display: block"
     >
       <div class="modal-dialog">
         <div class="modal-content">
@@ -116,8 +115,8 @@
             <button
               type="button"
               class="btn-close"
-              data-bs-dismiss="modal"
               aria-label="Close"
+              @click="hideAddTrainingModal"
             ></button>
           </div>
           <div class="modal-body">
@@ -129,7 +128,6 @@
                 type="text"
                 class="form-control"
                 id="inputTrainingName"
-                name="name"
                 v-model="training.name"
                 placeholder="Enter training name..."
                 :class="{ 'is-invalid': trainingNameError }"
@@ -147,7 +145,6 @@
                 type="text"
                 class="form-control"
                 id="inputDuration"
-                name="duration"
                 v-model="training.duration"
                 placeholder="Enter duration..."
                 :class="{ 'is-invalid': trainingDurationError }"
@@ -178,6 +175,15 @@
                 {{ trainingCategoryError }}
               </div>
             </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="hideAddTrainingModal"
+            >
+              Close
+            </button>
             <button type="button" class="btn btn-primary" @click="saveTraining">
               Add Training
             </button>
@@ -193,6 +199,50 @@
       </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div
+      v-if="showDeleteModal"
+      class="modal fade show"
+      id="deleteConfirmationModal"
+      tabindex="-1"
+      aria-labelledby="deleteConfirmationModalLabel"
+      aria-modal="true"
+      role="dialog"
+      style="display: block"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteConfirmationModalLabel">
+              Confirm Deletion
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close"
+              @click="showDeleteModal = false"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete this training?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="showDeleteModal = false"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-danger" @click="confirmDelete">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
     <nav aria-label="Page navigation example" class="m-3">
       <ul class="pagination justify-content-end">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -214,6 +264,7 @@
       </ul>
     </nav>
 
+    <!-- Error Alerts -->
     <div v-if="errorGetTrainings" class="alert alert-danger mt-3" role="alert">
       {{ errorGetTrainings }}
     </div>
@@ -224,70 +275,30 @@
     >
       {{ errorDeleteTraining }}
     </div>
-  </div>
 
-  <!-- Success Toast -->
-  <div
-    class="toast align-items-center bg-success text-white border-0"
-    role="alert"
-    aria-live="assertive"
-    aria-atomic="true"
-    :class="{ show: showToast }"
-    style="
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-    "
-  >
-    <div class="d-flex">
-      <div class="toast-body">{{ toastMessage }}</div>
-      <button
-        type="button"
-        class="btn-close btn-close-white me-2 m-auto"
-        aria-label="Close"
-        @click="closeToast"
-      ></button>
-    </div>
-  </div>
-
-  <!-- Delete Confirmation Modal -->
-  <div
-    class="modal"
-    id="deleteConfirmationModal"
-    tabindex="-1"
-    aria-labelledby="deleteConfirmationModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteConfirmationModalLabel">
-            Confirm Deletion
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          Are you sure you want to delete this training?
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancel
-          </button>
-          <button type="button" class="btn btn-danger" @click="confirmDelete">
-            Delete
-          </button>
-        </div>
+    <!-- Success Toast -->
+    <div
+      class="toast align-items-center bg-success text-white border-0"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      :class="{ show: showToast }"
+      style="
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+      "
+    >
+      <div class="d-flex">
+        <div class="toast-body">{{ toastMessage }}</div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+          aria-label="Close"
+          @click="closeToast"
+        ></button>
       </div>
     </div>
   </div>
@@ -295,13 +306,12 @@
 
 <script>
 import axios from "axios";
-import * as bootstrap from "bootstrap";
 
 export default {
   name: "TrainingView",
   data() {
     return {
-      trainings: [],
+      trainings: [], // Initialized as an empty array
       searchName: "",
       selectedCategory: "",
       searchDuration: "",
@@ -322,13 +332,22 @@ export default {
       showToast: false,
       toastMessage: "",
       trainingIdToDelete: null,
+      showModal: false,
+      showDeleteModal: false,
     };
   },
   computed: {
     uniqueCategories() {
-      return [...new Set(this.trainings.map((training) => training.category))];
+      if (!this.trainings || this.trainings.length === 0) {
+        return [];
+      }
+      const categories = this.trainings.map((training) => training.category);
+      return [...new Set(categories)];
     },
     filteredTrainingsList() {
+      if (!this.trainings) {
+        return [];
+      }
       return this.trainings.filter((training) => {
         const isMatchingName = training.name
           .toLowerCase()
@@ -336,55 +355,37 @@ export default {
         const isMatchingDuration = training.duration
           .toLowerCase()
           .includes(this.searchDuration.toLowerCase());
-        const isSelectedCategory =
-          this.selectedCategory === "" ||
-          training.category.toLowerCase() ===
-            this.selectedCategory.toLowerCase();
-        return isMatchingName && isSelectedCategory && isMatchingDuration;
+        const isMatchingCategory = this.selectedCategory
+          ? training.category === this.selectedCategory
+          : true;
+        return isMatchingName && isMatchingDuration && isMatchingCategory;
       });
+    },
+    currentPageItems() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.filteredTrainingsList.slice(start, end);
     },
     totalPages() {
       return Math.ceil(this.filteredTrainingsList.length / this.pageSize);
     },
-    startIndex() {
-      return (this.currentPage - 1) * this.pageSize;
-    },
-    endIndex() {
-      return Math.min(
-        this.startIndex + this.pageSize - 1,
-        this.filteredTrainingsList.length - 1
-      );
-    },
-    currentPageItems() {
-      return this.filteredTrainingsList.slice(
-        this.startIndex,
-        this.endIndex + 1
-      );
-    },
-  },
-  created() {
-    this.getTrainings();
   },
   methods: {
-    async getTrainings() {
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/api/trainings");
-        if (response.data && response.data.trainings) {
+    getTrainings() {
+      axios
+        .get("http://127.0.0.1:8000/api/trainings")
+        .then((response) => {
           this.trainings = response.data.trainings;
           this.errorGetTrainings = "";
-        } else {
-          this.errorGetTrainings = "No data available";
-        }
-      } catch (error) {
-        this.errorGetTrainings = "Failed to fetch trainings";
-        console.log(error);
-      }
+        })
+        .catch((error) => {
+          this.errorGetTrainings = "Failed to retrieve trainings.";
+          console.log(error);
+        });
     },
     confirmDeleteTraining(id) {
       this.trainingIdToDelete = id;
-      new bootstrap.Modal(
-        document.getElementById("deleteConfirmationModal")
-      ).show();
+      this.showDeleteModal = true;
     },
     async confirmDelete() {
       if (this.trainingIdToDelete !== null) {
@@ -396,67 +397,66 @@ export default {
           this.errorDeleteTraining = "";
           this.getTrainings();
           this.showSuccessToast("Training deleted successfully!");
-
-          // Hide the confirmation modal using vanilla JavaScript
-          const modal = document.getElementById("deleteConfirmationModal");
-          modal.classList.remove("show");
-          modal.setAttribute("aria-hidden", "true");
-          modal.setAttribute("style", "display: none");
-          document.body.classList.remove("modal-open");
-          const modalBackdrop =
-            document.getElementsByClassName("modal-backdrop");
-          document.body.removeChild(modalBackdrop[0]);
+          this.showDeleteModal = false;
         } catch (error) {
           this.errorDeleteTraining = "Failed to delete training";
           console.log(error);
         }
       }
     },
-
-    async saveTraining() {
-      try {
-        if (this.validateForm()) {
-          await axios.post("http://127.0.0.1:8000/api/trainings", {
-            name: this.training.name,
-            duration: this.training.duration,
-            category: this.training.category,
-          });
-          this.training.name = "";
-          this.training.duration = "";
-          this.training.category = "";
-          this.errorAddTraining = "";
-          this.getTrainings();
-          this.showSuccessToast("Training added successfully!");
-        }
-      } catch (error) {
-        this.errorAddTraining = error.response
-          ? error.response.data.message
-          : "Failed to add training";
-        console.log(error);
-      }
-    },
     validateForm() {
       this.trainingNameError = "";
       this.trainingDurationError = "";
       this.trainingCategoryError = "";
+      let isValid = true;
 
       if (!this.training.name) {
         this.trainingNameError = "Training name is required";
+        isValid = false;
       }
-
       if (!this.training.duration) {
-        this.trainingDurationError = "Duration is required";
+        this.trainingDurationError = "Training duration is required";
+        isValid = false;
       }
-
       if (!this.training.category) {
-        this.trainingCategoryError = "Category is required";
+        this.trainingCategoryError = "Training category is required";
+        isValid = false;
       }
 
-      return (
-        !this.trainingNameError &&
-        !this.trainingDurationError &&
-        !this.trainingCategoryError
-      );
+      return isValid;
+    },
+    saveTraining() {
+      if (this.validateForm()) {
+        axios
+          .post("http://127.0.0.1:8000/api/trainings", {
+            name: this.training.name,
+            duration: this.training.duration,
+            category: this.training.category,
+          })
+          .then(() => {
+            this.getTrainings();
+            this.showSuccessToast("Training added successfully!");
+            this.showModal = false;
+            this.resetTrainingForm();
+          })
+          .catch((error) => {
+            this.errorAddTraining = error.response
+              ? error.response.data.message
+              : "Failed to add training";
+            console.log(error);
+          });
+      }
+    },
+    resetTrainingForm() {
+      this.training = {
+        name: "",
+        duration: "",
+        category: "",
+      };
+      this.errorAddTraining = "";
+      this.trainingNameError = "";
+      this.trainingDurationError = "";
+      this.trainingCategoryError = "";
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -474,34 +474,33 @@ export default {
     showSuccessToast(message) {
       this.toastMessage = message;
       this.showToast = true;
-      setTimeout(() => {
-        this.showToast = false;
-      }, 3000);
+      setTimeout(this.closeToast, 3000);
     },
     closeToast() {
       this.showToast = false;
     },
+    hideAddTrainingModal() {
+      this.showModal = false;
+      this.resetTrainingForm();
+    },
+  },
+  mounted() {
+    this.getTrainings();
   },
   watch: {
     "training.name"(newName) {
-      if (!newName) {
-        this.trainingNameError = "Training name is required";
-      } else {
-        this.trainingNameError = "";
+      if (this.training) {
+        this.trainingNameError = !newName ? "Training name is required" : "";
       }
     },
     "training.duration"(newDuration) {
-      if (!newDuration) {
-        this.trainingDurationError = "Duration is required";
-      } else {
-        this.trainingDurationError = "";
+      if (this.training) {
+        this.trainingDurationError = !newDuration ? "Duration is required" : "";
       }
     },
     "training.category"(newCategory) {
-      if (!newCategory) {
-        this.trainingCategoryError = "Category is required";
-      } else {
-        this.trainingCategoryError = "";
+      if (this.training) {
+        this.trainingCategoryError = !newCategory ? "Category is required" : "";
       }
     },
   },
@@ -509,10 +508,7 @@ export default {
 </script>
 
 <style scoped>
-.is-invalid {
-  border-color: #dc3545;
-}
-.toast.show {
-  display: block;
+.modal-backdrop {
+  display: none;
 }
 </style>
