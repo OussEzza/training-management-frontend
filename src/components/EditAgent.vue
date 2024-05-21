@@ -6,6 +6,10 @@
       <input type="text" class="form-control" id="inputName" v-model="name" />
     </div>
     <div class="mb-3">
+      <label for="inputEmail" class="form-label">Email:</label>
+      <input type="email" class="form-control" id="inputEmail" v-model="email" />
+    </div>
+    <div class="mb-3">
       <label for="inputService" class="form-label">Service:</label>
       <input type="text" class="form-control" id="inputService" v-model="service" />
     </div>
@@ -13,10 +17,6 @@
       <label for="inputFunction" class="form-label">Function:</label>
       <input type="text" class="form-control" id="inputFunction" v-model="func" />
     </div>
-    <!-- <div class="mb-3">
-      <label for="inputDepartment" class="form-label">Department:</label>
-      <input type="text" class="form-control" id="inputDepartment" v-model="dept" />
-    </div> -->
     <button class="btn btn-primary" @click="updateAgent">Update Agent</button>
   </div>
 </template>
@@ -29,9 +29,9 @@ export default {
   data() {
     return {
       name: "",
+      email: "",
       service: "",
       func: "",
-      // dept: "",
       errors: {},
     };
   },
@@ -47,9 +47,9 @@ export default {
         const agent = response.data.agent;
         if (agent) {
           this.name = agent.name;
+          this.email = agent.email;
           this.service = agent.service;
           this.func = agent.function;
-          // this.dept = agent.department;
         }
       } catch (error) {
         console.error("Error fetching agent:", error);
@@ -61,9 +61,9 @@ export default {
           `http://127.0.0.1:8000/api/agents/${this.$route.params.id}`,
           {
             name: this.name,
+            email: this.email,
             service: this.service,
             function: this.func,
-            // department: this.dept,
           }
         );
         console.log("Response:", response.data); // Log response data for debugging
