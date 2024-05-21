@@ -1,41 +1,52 @@
 <template>
-  <div class="container m-10">
-    <img
-      src="../assets/logo.png"
-      alt="Login Image"
-      class="img-fluid rounded mx-auto d-block mb-4 mt-5"
-      style="height: 200px"
-    />
-    <h1>Login</h1>
-    <form @submit.prevent="login" class="mb-4">
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Email address</label>
-        <input
-          type="email"
-          class="form-control"
-          id="exampleInputEmail1"
-          aria-describedby="emailHelp"
-          v-model="loginData.email"
-          @input="clearError('email')"
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <img
+          src="../assets/logo.png"
+          alt="Login Image"
+          class="img-fluid rounded mx-auto d-block mb-4"
+          style="max-height: 200px"
         />
-        <div v-if="errors.email" class="text-danger">{{ errors.email }}</div>
+        <h1 class="text-center mb-4">Login</h1>
+        <form @submit.prevent="login">
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label"
+              >Email address</label
+            >
+            <input
+              type="email"
+              class="form-control"
+              id="exampleInputEmail1"
+              aria-describedby="emailHelp"
+              v-model="loginData.email"
+              @input="clearError('email')"
+            />
+            <div v-if="errors.email" class="invalid-feedback d-block">
+              {{ errors.email }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label"
+              >Password</label
+            >
+            <input
+              type="password"
+              class="form-control"
+              id="exampleInputPassword1"
+              v-model="loginData.password"
+              @input="clearError('password')"
+            />
+            <div v-if="errors.password" class="invalid-feedback d-block">
+              {{ errors.password }}
+            </div>
+          </div>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
       </div>
-      <div class="mb-3">
-        <label for="exampleInputPassword1" class="form-label">Password</label>
-        <input
-          type="password"
-          class="form-control"
-          id="exampleInputPassword1"
-          v-model="loginData.password"
-          @input="clearError('password')"
-        />
-        <div v-if="errors.password" class="text-danger">
-          {{ errors.password }}
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary">Login</button>
-    </form>
+    </div>
   </div>
 </template>
 

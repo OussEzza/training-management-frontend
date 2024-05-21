@@ -32,6 +32,16 @@
           </div>
         </router-link>
       </div>
+      <div class="col-md-4">
+        <router-link to="/agent-training" class="card-link">
+          <div class="card info">
+            <div class="card-body">
+              <h5 class="card-title">Total agent without Training</h5>
+              <p class="card-text">{{ agentWithoutTrainingCount }}</p>
+            </div>
+          </div>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -49,6 +59,7 @@ export default {
       agentCount: 0,
       trainingCount: 0,
       agentTrainingCount: 0,
+      agentWithoutTrainingCount: 0,
     };
   },
   created() {
@@ -71,6 +82,8 @@ export default {
           "http://127.0.0.1:8000/api/agent-training"
         );
         this.agentTrainingCount = agentTrainingResponse.data.agent_training.length;
+        
+        this.agentWithoutTrainingCount = this.agentCount - this.agentTrainingCount;
       } catch (error) {
         console.log(error);
       }
@@ -125,5 +138,9 @@ export default {
 .info {
   background-color: #17a2b8;
   color: #fff;
+}
+
+.col-md-4 {
+  margin-bottom: 20px;
 }
 </style>

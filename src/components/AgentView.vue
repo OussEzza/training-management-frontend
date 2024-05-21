@@ -5,7 +5,9 @@
       <div class="card-body">
         <!-- Filter Section -->
         <div class="mb-3">
-          <label for="searchAgentName" class="form-label">Search Agent by Name:</label>
+          <label for="searchAgentName" class="form-label"
+            >Search Agent by Name:</label
+          >
           <input
             type="text"
             class="form-control"
@@ -15,7 +17,9 @@
           />
         </div>
         <div class="mb-3">
-          <label for="searchAgentService" class="form-label">Search Agent by Service:</label>
+          <label for="searchAgentService" class="form-label"
+            >Search Agent by Service:</label
+          >
           <input
             type="text"
             class="form-control"
@@ -25,7 +29,9 @@
           />
         </div>
         <div class="mb-3">
-          <label for="searchAgentFunction" class="form-label">Search Agent by Function:</label>
+          <label for="searchAgentFunction" class="form-label"
+            >Search Agent by Function:</label
+          >
           <input
             type="text"
             class="form-control"
@@ -36,53 +42,55 @@
         </div>
 
         <!-- Table Section -->
-        <table class="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Service</th>
-              <th>Function</th>
-              <th>Actions</th>
-              <th>View</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(agent, index) in currentPageItems" :key="agent.id">
-              <td>{{ index + 1 }}</td>
-              <td>{{ agent.name }}</td>
-              <td>{{ agent.email }}</td>
-              <td>{{ agent.service }}</td>
-              <td>{{ agent.function }}</td>
-              <td>
-                <router-link
-                  :to="{ name: 'EditAgent', params: { id: agent.id } }"
-                  class="btn btn-sm btn-primary me-1"
-                >
-                  Edit
-                </router-link>
-                <button
-                  class="btn btn-sm btn-danger"
-                  @click="confirmDeleteAgent(agent.id)"
-                >
-                  Delete
-                </button>
-              </td>
-              <td>
-                <router-link
-                  :to="{
-                    name: 'ViewAssignedTraining',
-                    params: { id: agent.id },
-                  }"
-                  class="btn btn-sm btn-primary me-1"
-                >
-                  View
-                </router-link>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Service</th>
+                <th>Function</th>
+                <th>Actions</th>
+                <th>View</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(agent, index) in currentPageItems" :key="agent.id">
+                <td>{{ index + 1 }}</td>
+                <td>{{ agent.name }}</td>
+                <td>{{ agent.email }}</td>
+                <td>{{ agent.service }}</td>
+                <td>{{ agent.function }}</td>
+                <td>
+                  <router-link
+                    :to="{ name: 'EditAgent', params: { id: agent.id } }"
+                    class="btn btn-sm btn-primary me-1"
+                  >
+                    Edit
+                  </router-link>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    @click="confirmDeleteAgent(agent.id)"
+                  >
+                    Delete
+                  </button>
+                </td>
+                <td>
+                  <router-link
+                    :to="{
+                      name: 'ViewAssignedTraining',
+                      params: { id: agent.id },
+                    }"
+                    class="btn btn-sm btn-primary me-1"
+                  >
+                    View
+                  </router-link>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <!-- Add New Agent Form -->
         <div class="text-end mt-3">
@@ -107,7 +115,9 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="addAgentModalLabel">Add New Agent</h5>
+                <h5 class="modal-title" id="addAgentModalLabel">
+                  Add New Agent
+                </h5>
                 <button
                   type="button"
                   class="btn-close"
@@ -127,7 +137,9 @@
                       placeholder="Enter name"
                       :class="{ 'is-invalid': nameError }"
                     />
-                    <div v-if="nameError" class="invalid-feedback">{{ nameError }}</div>
+                    <div v-if="nameError" class="invalid-feedback">
+                      {{ nameError }}
+                    </div>
                   </div>
                   <div class="mb-3">
                     <label for="inputEmail" class="form-label">Email:</label>
@@ -139,10 +151,14 @@
                       placeholder="Enter email"
                       :class="{ 'is-invalid': emailError }"
                     />
-                    <div v-if="emailError" class="invalid-feedback">{{ emailError }}</div>
+                    <div v-if="emailError" class="invalid-feedback">
+                      {{ emailError }}
+                    </div>
                   </div>
                   <div class="mb-3">
-                    <label for="inputService" class="form-label">Service:</label>
+                    <label for="inputService" class="form-label"
+                      >Service:</label
+                    >
                     <input
                       type="text"
                       class="form-control"
@@ -151,10 +167,14 @@
                       placeholder="Enter service"
                       :class="{ 'is-invalid': serviceError }"
                     />
-                    <div v-if="serviceError" class="invalid-feedback">{{ serviceError }}</div>
+                    <div v-if="serviceError" class="invalid-feedback">
+                      {{ serviceError }}
+                    </div>
                   </div>
                   <div class="mb-3">
-                    <label for="inputFunction" class="form-label">Function:</label>
+                    <label for="inputFunction" class="form-label"
+                      >Function:</label
+                    >
                     <input
                       type="text"
                       class="form-control"
@@ -163,14 +183,30 @@
                       placeholder="Enter function"
                       :class="{ 'is-invalid': funcError }"
                     />
-                    <div v-if="funcError" class="invalid-feedback">{{ funcError }}</div>
+                    <div v-if="funcError" class="invalid-feedback">
+                      {{ funcError }}
+                    </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      Save changes
+                    </button>
                   </div>
                 </form>
-                <div v-if="errorAddAgent" class="alert alert-danger mt-3" role="alert">{{ errorAddAgent }}</div>
+                <div
+                  v-if="errorAddAgent"
+                  class="alert alert-danger mt-3"
+                  role="alert"
+                >
+                  {{ errorAddAgent }}
+                </div>
               </div>
             </div>
           </div>
@@ -189,15 +225,24 @@
             :key="page"
             :class="{ active: page === currentPage }"
           >
-            <button class="page-link" @click="changePage(page)">{{ page }}</button>
+            <button class="page-link" @click="changePage(page)">
+              {{ page }}
+            </button>
           </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <li
+            class="page-item"
+            :class="{ disabled: currentPage === totalPages }"
+          >
             <button class="page-link" @click="nextPage">Next</button>
           </li>
         </ul>
       </nav>
-      <div v-if="errorGetAgents" class="alert alert-danger mt-3" role="alert">{{ errorGetAgents }}</div>
-      <div v-if="errorDeleteAgent" class="alert alert-danger mt-3" role="alert">{{ errorDeleteAgent }}</div>
+      <div v-if="errorGetAgents" class="alert alert-danger mt-3" role="alert">
+        {{ errorGetAgents }}
+      </div>
+      <div v-if="errorDeleteAgent" class="alert alert-danger mt-3" role="alert">
+        {{ errorDeleteAgent }}
+      </div>
     </div>
   </div>
 
@@ -208,7 +253,13 @@
     aria-live="assertive"
     aria-atomic="true"
     :class="{ show: showToast }"
-    style="position: fixed; top: 10%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;"
+    style="
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+    "
   >
     <div class="d-flex">
       <div class="toast-body">{{ toastMessage }}</div>
@@ -232,7 +283,9 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+          <h5 class="modal-title" id="deleteConfirmationModalLabel">
+            Confirm Deletion
+          </h5>
           <button
             type="button"
             class="btn-close"
@@ -240,16 +293,25 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="modal-body">Are you sure you want to delete this agent?</div>
+        <div class="modal-body">
+          Are you sure you want to delete this agent?
+        </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" @click="confirmDelete">
+            Delete
+          </button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from "axios";

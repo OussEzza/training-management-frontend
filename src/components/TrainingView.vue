@@ -48,46 +48,48 @@
         </div>
       </div>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Training Name</th>
-          <th>Duration per year</th>
-          <th>Category</th>
-          <th>Actions</th>
-          <th>View</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(training, index) in currentPageItems" :key="training.id">
-          <td>{{ index + 1 }}</td>
-          <td>{{ training.name }}</td>
-          <td>{{ training.duration }}</td>
-          <td>{{ training.category }}</td>
-          <td>
-            <router-link
-              :to="{ name: 'Edit', params: { id: training.id } }"
-              class="btn btn-sm btn-primary me-1"
-              >Edit</router-link
-            >
-            <button
-              class="btn btn-sm btn-danger"
-              @click="confirmDeleteTraining(training.id)"
-            >
-              Delete
-            </button>
-          </td>
-          <td>
-            <router-link
-              :to="{ name: 'ViewAssignedAgent', params: { id: training.id } }"
-              class="btn btn-sm btn-primary me-1"
-              >View</router-link
-            >
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Training Name</th>
+            <th>Duration per year</th>
+            <th>Category</th>
+            <th>Actions</th>
+            <th>View</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(training, index) in currentPageItems" :key="training.id">
+            <td>{{ index + 1 }}</td>
+            <td>{{ training.name }}</td>
+            <td>{{ training.duration }}</td>
+            <td>{{ training.category }}</td>
+            <td>
+              <router-link
+                :to="{ name: 'Edit', params: { id: training.id } }"
+                class="btn btn-sm btn-primary me-1"
+                >Edit</router-link
+              >
+              <button
+                class="btn btn-sm btn-danger"
+                @click="confirmDeleteTraining(training.id)"
+              >
+                Delete
+              </button>
+            </td>
+            <td>
+              <router-link
+                :to="{ name: 'ViewAssignedAgent', params: { id: training.id } }"
+                class="btn btn-sm btn-primary me-1"
+                >View</router-link
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="text-end mt-3">
       <button type="button" class="btn btn-primary" @click="showModal = true">
