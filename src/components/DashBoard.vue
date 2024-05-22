@@ -46,9 +46,6 @@
   </div>
 </template>
 
-
-
-
 <script>
 import axios from "axios";
 
@@ -68,22 +65,23 @@ export default {
   methods: {
     async fetchStatistics() {
       try {
-        const agentResponse = await axios.get(
-          "http://127.0.0.1:8000/api/agents"
-        );
-        this.agentCount = agentResponse.data.agents.length;
+        const agentResponse = await axios.get("http://127.0.0.1:8000/api/agents");
+        const agents = agentResponse.data.agents;
+        this.agentCount = agents.length;
 
-        const trainingResponse = await axios.get(
-          "http://127.0.0.1:8000/api/trainings"
-        );
+        const trainingResponse = await axios.get("http://127.0.0.1:8000/api/trainings");
         this.trainingCount = trainingResponse.data.trainings.length;
 
-        const agentTrainingResponse = await axios.get(
-          "http://127.0.0.1:8000/api/agent-training"
-        );
-        this.agentTrainingCount = agentTrainingResponse.data.agent_training.length;
+        const agentTrainingResponse = await axios.get("http://127.0.0.1:8000/api/agent-training");
+        const agentTrainings = agentTrainingResponse.data.agent_training;
+        this.agentTrainingCount = agentTrainings.length;
+
+        // Use a set to track unique agents who have training
+        const agentsWithTraining = new Set();
+        agentTrainings.forEach(at => agentsWithTraining.add(at.agent_id));
         
-        this.agentWithoutTrainingCount = this.agentCount - this.agentTrainingCount;
+        // Calculate agents without training
+        this.agentWithoutTrainingCount = this.agentCount - agentsWithTraining.size;
       } catch (error) {
         console.log(error);
       }
@@ -91,7 +89,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .card-link {
