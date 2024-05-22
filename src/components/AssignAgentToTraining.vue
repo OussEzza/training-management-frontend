@@ -71,16 +71,29 @@
                   </div>
                 </div>
                 <div class="mb-3">
-                  <label for="date" class="form-label">Date:</label>
+                  <label for="dateFrom" class="form-label">Date From:</label>
                   <input
                     type="date"
                     class="form-control"
-                    id="date"
-                    v-model="date"
-                    :class="{ 'is-invalid': errors.date }"
+                    id="dateFrom"
+                    v-model="dateFrom"
+                    :class="{ 'is-invalid': errors.dateFrom }"
                   />
-                  <div v-if="errors.date" class="invalid-feedback">
-                    {{ errors.date[0] }}
+                  <div v-if="errors.dateFrom" class="invalid-feedback">
+                    {{ errors.dateFrom[0] }}
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="dateTo" class="form-label">Date To:</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="dateTo"
+                    v-model="dateTo"
+                    :class="{ 'is-invalid': errors.dateTo }"
+                  />
+                  <div v-if="errors.dateTo" class="invalid-feedback">
+                    {{ errors.dateTo[0] }}
                   </div>
                 </div>
               </div>
@@ -125,14 +138,16 @@
             <tr>
               <th>Agent</th>
               <th>Training</th>
-              <th>Date</th>
+              <th>Date from</th>
+              <th>Date to</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="record in agent_training" :key="record.id">
               <td>{{ getAgentName(record.agent_id) }}</td>
               <td>{{ getTrainingName(record.training_id) }}</td>
-              <td>{{ record.date }}</td>
+              <td>{{ record.date_from }}</td>
+              <td>{{ record.date_to }}</td>
             </tr>
           </tbody>
         </table>
@@ -182,7 +197,8 @@ export default {
       trainings: [],
       agentId: "",
       trainingId: "",
-      date: "",
+      dateFrom: "",
+      dateTo: "",
       errors: {},
       showModal: false,
       showToast: false,
@@ -202,18 +218,20 @@ export default {
           await axios.post("http://127.0.0.1:8000/api/agent-training", {
             agent_id: this.agentId,
             training_id: this.trainingId,
-            date: this.date,
+            date_from: this.dateFrom,
+            date_to: this.dateTo,
           });
+          // Reset data properties and close modal
           this.agentId = "";
           this.trainingId = "";
-          this.date = "";
+          this.dateFrom = "";
+          this.dateTo = "";
           this.showModal = false;
+          // Fetch updated data and show success message
           this.getAgentTraining();
           this.showToast = true;
           this.messageAssignAgentToTraining =
             "Agent assigned to training successfully";
-          this.errorAssignAgentToTraining = "";
-
           setTimeout(() => {
             this.showToast = false;
           }, 3000);
@@ -279,12 +297,16 @@ export default {
       if (!this.trainingId) {
         this.errors.trainingId = ["Training is required"];
       }
-      if (!this.date) {
-        this.errors.date = ["Date is required"];
+      if (!this.dateFrom) {
+        this.errors.dateFrom = ["Start date is required"];
+      }
+      if (!this.dateTo) {
+        this.errors.dateTo = ["End date is required"];
       }
 
       return Object.keys(this.errors).length === 0;
     },
+
     closeToast() {
       this.showToast = false;
     },
@@ -304,7 +326,14 @@ export default {
         this.errors.trainingId = "";
       }
     },
-    date(newDate) {
+    dateFrom(newDate) {
+      if (!newDate) {
+        this.errors.date = ["Date is required"];
+      } else {
+        this.errors.date = "";
+      }
+    },
+    dateTo(newDate) {
       if (!newDate) {
         this.errors.date = ["Date is required"];
       } else {

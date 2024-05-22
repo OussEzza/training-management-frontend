@@ -78,21 +78,6 @@
                 }}</span>
               </button>
               <ul class="dropdown-menu">
-                <li>
-                  <div class="dropdown-item-text">
-                    <label for="days"
-                      >Show trainings expiring in less than:</label
-                    >
-                    <input
-                      type="number"
-                      id="days"
-                      v-model="expiringInDays"
-                      @change="showExpiringTrainingsAlert"
-                      min="1"
-                    />
-                    <span> days</span>
-                  </div>
-                </li>
                 <li v-if="expiringTrainings.length > 0">
                   <h6 class="dropdown-header">Expiring Trainings</h6>
                   <button
@@ -138,7 +123,6 @@ export default {
       expiringTrainings: [],
       agents: [],
       trainings: [],
-      expiringInDays: 30, // Default value for testing
     };
   },
   methods: {
@@ -189,76 +173,33 @@ export default {
         console.error("Error fetching trainings:", error);
       }
     },
-    async showExpiringTrainingsAlert() {
-      // Get today's date
+    showExpiringTrainingsAlert() {
       const today = new Date();
-      // Initialize the array to store expiring trainings
-      this.expiringTrainings = [];
-
-      // Loop through each training of the agent
-      for (const training of this.agent_training) {
+      this.expiringTrainings = this.agent_training.filter(async (training) => {
         try {
-          // Fetch details of the training from the API
           const response = await axios.get(
             `http://127.0.0.1:8000/api/trainings/${training.training_id}`
           );
-
-          // Get the start date of the training
-          const startDate = new Date(training.date_to);
-
-          // Get the duration and duration unit of the training
-          const duration = response.data.training.duration;
-          const durationUnit = response.data.training.duration_unit;
-
-          // Convert duration to days
-          let durationInDays = 0;
-          if (durationUnit === "year") {
-            durationInDays = duration * 365; // Assuming 1 year = 365 days
-          } else if (durationUnit === "month") {
-            // Approximate months to days (assuming 30 days per month)
-            durationInDays = duration * 30;
-          } else if (durationUnit === "day") {
-            durationInDays = duration;
-          }
-          console.log("durationInDays ", durationInDays);
-          // Calculate the expiry date based on the start date and duration
-          const expiryDate = new Date(
-            startDate.getTime() + durationInDays * 24 * 60 * 60 * 1000
+          const startDate = new Date(training.date_from);
+          const expiryDate = this.calculateExpiryDate(
+            startDate,
+            response.data.training.duration
           );
-          console.log("Expir date: " + expiryDate);
-          // Calculate the difference in days between expiry date and today's date
           const diffInDays = Math.floor(
             (expiryDate - today) / (1000 * 60 * 60 * 24)
           );
-          console.log("diffInDays is ", diffInDays);
-          // Check if the training is expiring within the specified period
-          if (diffInDays <= this.expiringInDays && diffInDays > 0) {
-            // If yes, push the training to the expiringTrainings array
-            this.expiringTrainings.push(training);
-          }
+
+          return diffInDays <= 30 && diffInDays > 0;
         } catch (error) {
-          // Handle any errors that occur during the process
           console.error("Error fetching training details:", error);
+          return false; // Or handle the error appropriately
         }
-      }
+      });
     },
 
-    // Function to calculate the expiry date based on start date, duration, and duration unit
-    // calculateExpiryDate(startDate, duration, durationUnit) {
-    //   const expiryDate = new Date(startDate);
-    //   console.log("Start date", expiryDate);
-
-    //   if (durationUnit === "year") {
-    //     expiryDate.setFullYear(expiryDate.getFullYear() + duration);
-    //   } else if (durationUnit === "month") {
-    //     expiryDate.setMonth(expiryDate.getMonth() + duration);
-    //   } else if (durationUnit === "days") {
-    //     expiryDate.setDate(expiryDate.getDate() + duration);
-    //   }
-    //   console.log("Expired in : ",expiryDate);
-
-    //   return expiryDate;
-    // },
+    calculateExpiryDate(startDate, endDate) {
+      return new Date(endDate);
+    },
 
     getAgentName(agentId) {
       const agent = this.agents.find((agent) => agent.id === agentId);

@@ -38,7 +38,7 @@
           >
             <option value="">All Categories</option>
             <option
-              v-for="category in uniqueCategories"
+              v-for="category in Categories"
               :key="category"
               :value="category"
             >
@@ -54,7 +54,7 @@
           <tr>
             <th>#</th>
             <th>Training Name</th>
-            <th>Duration per year</th>
+            <th>Validity</th>
             <th>Category</th>
             <th>Actions</th>
             <th>View</th>
@@ -64,14 +64,21 @@
           <tr v-for="(training, index) in currentPageItems" :key="training.id">
             <td>{{ index + 1 }}</td>
             <td>{{ training.name }}</td>
-            <td>{{ training.duration }}</td>
+            <td>{{ training.duration }} {{ training.duration_unit }}</td>
             <td>{{ training.category }}</td>
             <td>
-              <router-link
+              <!-- <router-link
                 :to="{ name: 'Edit', params: { id: training.id } }"
                 class="btn btn-sm btn-primary me-1"
                 >Edit</router-link
+              > -->
+              <button
+                class="btn btn-sm btn-primary me-1"
+                @click="showEditTrainingModal(training)"
               >
+                Edit
+              </button>
+
               <button
                 class="btn btn-sm btn-danger"
                 @click="confirmDeleteTraining(training.id)"
@@ -90,9 +97,12 @@
         </tbody>
       </table>
     </div>
-
     <div class="text-end mt-3">
-      <button type="button" class="btn btn-primary" @click="showModal = true">
+      <button
+        type="button"
+        class="btn btn-primary"
+        @click="showAddTrainingModal"
+      >
         Add New Training
       </button>
     </div>
@@ -140,11 +150,9 @@
               </div>
             </div>
             <div class="mb-3">
-              <label for="inputDuration" class="form-label"
-                >Duration per year:</label
-              >
+              <label for="inputDuration" class="form-label">Validity:</label>
               <input
-                type="text"
+                type="number"
                 class="form-control"
                 id="inputDuration"
                 v-model="training.duration"
@@ -155,6 +163,20 @@
               <div v-if="trainingDurationError" class="invalid-feedback">
                 {{ trainingDurationError }}
               </div>
+            </div>
+            <div class="mb-3">
+              <label for="inputDurationFormat" class="form-label"
+                >Validity Format:</label
+              >
+              <select
+                class="form-select"
+                id="inputDurationFormat"
+                v-model="training.durationFormat"
+              >
+                <option value="year">Year(s)</option>
+                <option value="month">Month(s)</option>
+                <option value="day">Day(s)</option>
+              </select>
             </div>
             <div class="mb-3">
               <label for="inputCategory" class="form-label">Category:</label>
@@ -278,6 +300,123 @@
       {{ errorDeleteTraining }}
     </div>
 
+    <!-- Edit Training Modal -->
+    <div
+      v-if="showEditModal"
+      class="modal fade show"
+      id="editTrainingModal"
+      tabindex="-1"
+      aria-labelledby="editTrainingModalLabel"
+      aria-modal="true"
+      role="dialog"
+      style="display: block"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editTrainingModalLabel">
+              Edit Training
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close"
+              @click="hideEditTrainingModal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="inputTrainingName" class="form-label"
+                >Training Name:</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="inputTrainingName"
+                v-model="editingTraining.name"
+                :class="{ 'is-invalid': trainingNameError }"
+                required
+              />
+              <div v-if="trainingNameError" class="invalid-feedback">
+                {{ trainingNameError }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="inputDuration" class="form-label">Validity:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="inputDuration"
+                v-model="editingTraining.duration"
+                :class="{ 'is-invalid': trainingDurationError }"
+                required
+              />
+              <div v-if="trainingDurationError" class="invalid-feedback">
+                {{ trainingDurationError }}
+              </div>
+              <div class="mb-3">
+                <label for="inputDurationFormat" class="form-label"
+                  >Validity Format:</label
+                >
+                <select
+                  class="form-select"
+                  id="inputDurationFormat"
+                  v-model="editingTraining.durationFormat"
+                >
+                  <option value="">Select Validity Format</option>
+                  <option
+                    v-for="durationFormat in durationFormats"
+                    :key="durationFormat"
+                    :value="durationFormat"
+                  >
+                    {{ durationFormat }}
+                  </option>
+                </select>
+              </div>
+              <!-- Validation error message if needed -->
+              <div class="mb-3">
+                <label for="inputCategory" class="form-label">Category:</label>
+                <select
+                  class="form-select"
+                  id="inputCategory"
+                  v-model="editingTraining.category"
+                  :class="{ 'is-invalid': trainingCategoryError }"
+                >
+                  <option value="">Select Category</option>
+                  <option
+                    v-for="category in Categories"
+                    :key="category"
+                    :value="category"
+                  >
+                    {{ category }}
+                  </option>
+                </select>
+                <div v-if="trainingCategoryError" class="invalid-feedback">
+                  {{ trainingCategoryError }}
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="hideEditTrainingModal"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="saveEditedTraining"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- Success Toast -->
     <div
       class="toast align-items-center bg-success text-white border-0"
@@ -313,13 +452,14 @@ export default {
   name: "TrainingView",
   data() {
     return {
-      trainings: [], // Initialized as an empty array
+      trainings: [],
       searchName: "",
       selectedCategory: "",
       searchDuration: "",
       training: {
         name: "",
         duration: "",
+        durationFormat: "year",
         category: "",
       },
       Categories: ["Category 1", "Category 2", "Category 3"],
@@ -336,27 +476,29 @@ export default {
       trainingIdToDelete: null,
       showModal: false,
       showDeleteModal: false,
+      editingTraining: {
+        id: null,
+        name: "",
+        duration: "",
+        durationFormat: "",
+        category: "",
+      },
+      durationFormats: ["year", "month", "day"],
+      showEditModal: false,
     };
   },
   computed: {
     uniqueCategories() {
-      if (!this.trainings || this.trainings.length === 0) {
-        return [];
-      }
-      const categories = this.trainings.map((training) => training.category);
-      return [...new Set(categories)];
+      return [...new Set(this.trainings.map((training) => training.category))];
     },
     filteredTrainingsList() {
-      if (!this.trainings) {
-        return [];
-      }
       return this.trainings.filter((training) => {
         const isMatchingName = training.name
           .toLowerCase()
           .includes(this.searchName.toLowerCase());
-        const isMatchingDuration = training.duration
-          .toLowerCase()
-          .includes(this.searchDuration.toLowerCase());
+        const isMatchingDuration =
+          this.searchDuration === "" ||
+          training.duration.toString().includes(this.searchDuration);
         const isMatchingCategory = this.selectedCategory
           ? training.category === this.selectedCategory
           : true;
@@ -373,17 +515,15 @@ export default {
     },
   },
   methods: {
-    getTrainings() {
-      axios
-        .get("http://127.0.0.1:8000/api/trainings")
-        .then((response) => {
-          this.trainings = response.data.trainings;
-          this.errorGetTrainings = "";
-        })
-        .catch((error) => {
-          this.errorGetTrainings = "Failed to retrieve trainings.";
-          console.log(error);
-        });
+    async getTrainings() {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/api/trainings");
+        this.trainings = response.data.trainings;
+        this.errorGetTrainings = "";
+      } catch (error) {
+        this.errorGetTrainings = "Failed to retrieve trainings.";
+        console.error(error);
+      }
     },
     confirmDeleteTraining(id) {
       this.trainingIdToDelete = id;
@@ -395,64 +535,56 @@ export default {
           await axios.delete(
             `http://127.0.0.1:8000/api/trainings/${this.trainingIdToDelete}`
           );
-          this.trainingIdToDelete = null;
-          this.errorDeleteTraining = "";
           this.getTrainings();
           this.showSuccessToast("Training deleted successfully!");
           this.showDeleteModal = false;
         } catch (error) {
           this.errorDeleteTraining = "Failed to delete training";
-          console.log(error);
+          console.error(error);
         }
       }
     },
-    validateForm() {
-      this.trainingNameError = "";
-      this.trainingDurationError = "";
-      this.trainingCategoryError = "";
-      let isValid = true;
-
-      if (!this.training.name) {
-        this.trainingNameError = "Training name is required";
-        isValid = false;
-      }
-      if (!this.training.duration) {
-        this.trainingDurationError = "Training duration is required";
-        isValid = false;
-      }
-      if (!this.training.category) {
-        this.trainingCategoryError = "Training category is required";
-        isValid = false;
-      }
-
-      return isValid;
+    validateForm(training) {
+      const errors = {};
+      if (!training.name) errors.trainingName = "Training name is required";
+      if (!training.duration)
+        errors.trainingDuration = "Training duration is required";
+      if (!training.category)
+        errors.trainingCategory = "Training category is required";
+      return errors;
     },
     saveTraining() {
-      if (this.validateForm()) {
+      const errors = this.validateForm(this.training);
+      if (Object.keys(errors).length === 0) {
         axios
           .post("http://127.0.0.1:8000/api/trainings", {
             name: this.training.name,
             duration: this.training.duration,
+            duration_unit: this.training.durationFormat,
             category: this.training.category,
           })
           .then(() => {
             this.getTrainings();
             this.showSuccessToast("Training added successfully!");
-            this.showModal = false;
-            this.resetTrainingForm();
+            this.hideAddTrainingModal();
           })
           .catch((error) => {
             this.errorAddTraining = error.response
               ? error.response.data.message
               : "Failed to add training";
-            console.log(error);
+            console.error(error);
           });
+      } else {
+        this.trainingNameError = errors.trainingName || "";
+        this.trainingDurationError = errors.trainingDuration || "";
+        this.trainingCategoryError = errors.trainingCategory || "";
       }
     },
     resetTrainingForm() {
       this.training = {
         name: "",
         duration: "",
+        durationFormat: "year",
         category: "",
       };
       this.errorAddTraining = "";
@@ -476,14 +608,75 @@ export default {
     showSuccessToast(message) {
       this.toastMessage = message;
       this.showToast = true;
-      setTimeout(this.closeToast, 3000);
+      setTimeout(() => {
+        this.showToast = false;
+      }, 3000);
     },
     closeToast() {
       this.showToast = false;
     },
+    showAddTrainingModal() {
+      this.showModal = true;
+      this.resetTrainingForm();
+    },
     hideAddTrainingModal() {
       this.showModal = false;
       this.resetTrainingForm();
+    },
+    showEditTrainingModal(training) {
+      // this.editingTraining = { ...training };
+      this.editingTraining = {
+        id: training.id,
+        name: training.name,
+        duration: training.duration,
+        durationFormat: training.duration_unit,
+        category: training.category,
+      }
+      this.showEditModal = true;
+    },
+    hideEditTrainingModal() {
+      this.showEditModal = false;
+      this.editingTraining = {
+        id: null,
+        name: "",
+        duration: "",
+        durationFormat: "",
+        category: "",
+      };
+    },
+    validateEditForm() {
+      return this.validateForm(this.editingTraining);
+    },
+    saveEditedTraining() {
+      const errors = this.validateEditForm();
+      if (Object.keys(errors).length === 0) {
+        axios
+          .put(
+            `http://127.0.0.1:8000/api/trainings/${this.editingTraining.id}`,
+            {
+              // this.editingTraining
+              name: this.editingTraining.name,
+              duration: this.editingTraining.duration,
+              duration_unit: this.editingTraining.durationFormat,
+              category: this.editingTraining.category,
+            }
+          )
+          .then(() => {
+            this.getTrainings();
+            this.showSuccessToast("Training updated successfully!");
+            this.hideEditTrainingModal();
+          })
+          .catch((error) => {
+            this.errorAddTraining = error.response
+              ? error.response.data.message
+              : "Failed to update training";
+            console.error(error);
+          });
+      } else {
+        this.trainingNameError = errors.trainingName || "";
+        this.trainingDurationError = errors.trainingDuration || "";
+        this.trainingCategoryError = errors.trainingCategory || "";
+      }
     },
   },
   mounted() {
@@ -491,19 +684,22 @@ export default {
   },
   watch: {
     "training.name"(newName) {
-      if (this.training) {
-        this.trainingNameError = !newName ? "Training name is required" : "";
-      }
+      this.trainingNameError = !newName ? "Training name is required" : "";
     },
     "training.duration"(newDuration) {
-      if (this.training) {
-        this.trainingDurationError = !newDuration ? "Duration is required" : "";
-      }
+      this.trainingDurationError = !newDuration ? "Validity is required" : "";
     },
     "training.category"(newCategory) {
-      if (this.training) {
-        this.trainingCategoryError = !newCategory ? "Category is required" : "";
-      }
+      this.trainingCategoryError = !newCategory ? "Category is required" : "";
+    },
+    "editingTraining.name"(newName) {
+      this.trainingNameError = !newName ? "Training name is required" : "";
+    },
+    "editingTraining.duration"(newDuration) {
+      this.trainingDurationError = !newDuration ? "Validity is required" : "";
+    },
+    "editingTraining.category"(newCategory) {
+      this.trainingCategoryError = !newCategory ? "Category is required" : "";
     },
   },
 };

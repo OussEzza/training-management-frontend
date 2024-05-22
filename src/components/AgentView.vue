@@ -63,15 +63,15 @@
                 <td>{{ agent.service }}</td>
                 <td>{{ agent.function }}</td>
                 <td>
-                  <router-link
-                    :to="{ name: 'EditAgent', params: { id: agent.id } }"
+                  <button
                     class="btn btn-sm btn-primary me-1"
+                    @click="showEditAgentModal(agent)"
                   >
                     Edit
-                  </router-link>
+                  </button>
                   <button
                     class="btn btn-sm btn-danger"
-                    @click="confirmDeleteAgent(agent.id)"
+                    @click="showDeleteConfirmationModal(agent.id)"
                   >
                     Delete
                   </button>
@@ -92,7 +92,7 @@
           </table>
         </div>
 
-        <!-- Add New Agent Form -->
+        <!-- Add New Agent Button -->
         <div class="text-end mt-3">
           <button
             type="button"
@@ -211,102 +211,244 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Pagination -->
-      <nav aria-label="Page navigation example" class="m-3">
-        <ul class="pagination justify-content-end">
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <button class="page-link" @click="prevPage">Previous</button>
-          </li>
-          <li
-            class="page-item"
-            v-for="page in totalPages"
-            :key="page"
-            :class="{ active: page === currentPage }"
-          >
-            <button class="page-link" @click="changePage(page)">
-              {{ page }}
-            </button>
-          </li>
-          <li
-            class="page-item"
-            :class="{ disabled: currentPage === totalPages }"
-          >
-            <button class="page-link" @click="nextPage">Next</button>
-          </li>
-        </ul>
-      </nav>
-      <div v-if="errorGetAgents" class="alert alert-danger mt-3" role="alert">
-        {{ errorGetAgents }}
-      </div>
-      <div v-if="errorDeleteAgent" class="alert alert-danger mt-3" role="alert">
-        {{ errorDeleteAgent }}
-      </div>
-    </div>
-  </div>
+        <!-- Edit Agent Modal -->
+        <div
+          class="modal fade"
+          id="editAgentModal"
+          tabindex="-1"
+          aria-labelledby="editAgentModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editAgentModalLabel">Edit Agent</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <form @submit.prevent="handleEditAgent">
+                  <div class="mb-3">
+                    <label for="editInputName" class="form-label">Name:</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editInputName"
+                      v-model="editName"
+                      placeholder="Enter name"
+                      :class="{ 'is-invalid': editNameError }"
+                    />
+                    <div v-if="editNameError" class="invalid-feedback">
+                      {{ editNameError }}
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="editInputEmail" class="form-label"
+                      >Email:</label
+                    >
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="editInputEmail"
+                      v-model="editEmail"
+                      placeholder="Enter email"
+                      :class="{ 'is-invalid': editEmailError }"
+                    />
+                    <div v-if="editEmailError" class="invalid-feedback">
+                      {{ editEmailError }}
+                    </div>
+                  </div>
 
-  <!-- Success Toast -->
-  <div
-    class="toast align-items-center bg-success text-white border-0"
-    role="alert"
-    aria-live="assertive"
-    aria-atomic="true"
-    :class="{ show: showToast }"
-    style="
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-    "
-  >
-    <div class="d-flex">
-      <div class="toast-body">{{ toastMessage }}</div>
-      <button
-        type="button"
-        class="btn-close btn-close-white me-2 m-auto"
-        aria-label="Close"
-        @click="closeToast"
-      ></button>
-    </div>
-  </div>
-
-  <!-- Delete Confirmation Modal -->
-  <div
-    class="modal fade"
-    id="deleteConfirmationModal"
-    tabindex="-1"
-    aria-labelledby="deleteConfirmationModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteConfirmationModalLabel">
-            Confirm Deletion
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+                  <div class="mb-3">
+                    <label for="editInputService" class="form-label"
+                      >Service:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editInputService"
+                      v-model="editService"
+                      placeholder="Enter service"
+                      :class="{ 'is-invalid': editServiceError }"
+                    />
+                    <div v-if="editServiceError" class="invalid-feedback">
+                      {{ editServiceError }}
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="editInputFunction" class="form-label"
+                      >Function:</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editInputFunction"
+                      v-model="editFunc"
+                      placeholder="Enter function"
+                      :class="{ 'is-invalid': editFuncError }"
+                    />
+                    <div v-if="editFuncError" class="invalid-feedback">
+                      {{ editFuncError }}
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      Save changes
+                    </button>
+                  </div>
+                </form>
+                <div
+                  v-if="errorEditAgent"
+                  class="alert alert-danger mt-3"
+                  role="alert"
+                >
+                  {{ errorEditAgent }}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="modal-body">
-          Are you sure you want to delete this agent?
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mt-3">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a class="page-link" href="#" @click.prevent="changePage(1)"
+                >First</a
+              >
+            </li>
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(currentPage - 1)"
+                >Previous</a
+              >
+            </li>
+            <li
+              v-for="page in totalPages"
+              :key="page"
+              class="page-item"
+              :class="{ active: currentPage === page }"
+            >
+              <a class="page-link" href="#" @click.prevent="changePage(page)">{{
+                page
+              }}</a>
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(currentPage + 1)"
+                >Next</a
+              >
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(totalPages)"
+                >Last</a
+              >
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Delete Confirmation Modal -->
+        <div
+          class="modal fade"
+          id="deleteConfirmationModal"
+          tabindex="-1"
+          aria-labelledby="deleteConfirmationModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">
+                  Confirm Delete
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete this agent?
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="deleteAgent"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
+
+        <!-- Toast Notification -->
+
+        <div
+          class="toast-container align-items-center text-white border-0"
+          style="
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11;
+          "
+          :class="{ show: showSuccessToast }"
+        >
+          <div
+            id="liveToast"
+            class="toast"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            data-bs-delay="3000"
           >
-            Cancel
-          </button>
-          <button type="button" class="btn btn-danger" @click="confirmDelete">
-            Delete
-          </button>
+            <div class="toast-header">
+              <strong class="me-auto">Notification</strong>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+                @click="closeToast"
+              ></button>
+            </div>
+            <div class="toast-body bg-success">{{ toastMessage }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -318,177 +460,251 @@ import axios from "axios";
 import * as bootstrap from "bootstrap";
 
 export default {
-  name: "AgentView",
   data() {
     return {
       agents: [],
+      currentPage: 1,
+      itemsPerPage: 2,
+      searchName: "",
+      searchService: "",
+      searchFunction: "",
       name: "",
       email: "",
       service: "",
       func: "",
-      searchName: "",
-      searchService: "",
-      searchFunction: "",
       nameError: "",
       emailError: "",
       serviceError: "",
       funcError: "",
-      errorGetAgents: "",
-      errorDeleteAgent: "",
+      editName: "",
+      editEmail: "",
+      editService: "",
+      editFunc: "",
+      editNameError: "",
+      editEmailError: "",
+      editServiceError: "",
+      editFuncError: "",
+      editAgentId: null,
       errorAddAgent: "",
-      currentPage: 1,
-      pageSize: 2,
-      showToast: false,
+      errorEditAgent: "",
+      deleteAgentId: null,
       toastMessage: "",
-      agentIdToDelete: null,
+      showSuccessToast: false,
     };
   },
   computed: {
-    filteredAgentsList() {
-      return this.agents.filter((agent) => {
-        const isMatchingName = agent.name
-          .toLowerCase()
-          .includes(this.searchName.toLowerCase());
-        const isMatchingService = agent.service
-          .toLowerCase()
-          .includes(this.searchService.toLowerCase());
-        const isMatchingFunction = agent.function
-          .toLowerCase()
-          .includes(this.searchFunction.toLowerCase());
-        return isMatchingName && isMatchingService && isMatchingFunction;
-      });
-    },
-    totalPages() {
-      return Math.ceil(this.filteredAgentsList.length / this.pageSize);
-    },
-    startIndex() {
-      return (this.currentPage - 1) * this.pageSize;
-    },
-    endIndex() {
-      return Math.min(
-        this.startIndex + this.pageSize - 1,
-        this.filteredAgentsList.length - 1
+    filteredAgents() {
+      if (!this.agents) return [];
+      return this.agents.filter(
+        (agent) =>
+          (!this.searchName ||
+            agent.name.toLowerCase().includes(this.searchName.toLowerCase())) &&
+          (!this.searchService ||
+            agent.service
+              .toLowerCase()
+              .includes(this.searchService.toLowerCase())) &&
+          (!this.searchFunction ||
+            agent.function
+              .toLowerCase()
+              .includes(this.searchFunction.toLowerCase()))
       );
     },
-    currentPageItems() {
-      return this.filteredAgentsList.slice(this.startIndex, this.endIndex + 1);
+    totalPages() {
+      return Math.ceil(this.filteredAgents.length / this.itemsPerPage);
     },
-  },
-  created() {
-    this.getAgents();
+    currentPageItems() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredAgents.slice(start, end);
+    },
+    isEmailValid() {
+      return (
+        this.email &&
+        this.isValidEmail(this.email) &&
+        !this.emailExists(this.email)
+      );
+    },
   },
   methods: {
-    async getAgents() {
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/api/agents");
-        if (response.data && response.data.agents) {
-          this.agents = response.data.agents;
-          this.errorGetAgents = "";
-        } else {
-          this.errorGetAgents = "No data available";
-        }
-      } catch (error) {
-        this.errorGetAgents = "Failed to fetch agents";
-        console.log(error);
+    fetchAgents() {
+      axios.get("http://127.0.0.1:8000/api/agents").then((response) => {
+        this.agents = response.data.agents;
+      });
+    },
+    changePage(page) {
+      this.currentPage = page;
+    },
+    validateEmail() {
+      const errors = {};
+      if (!this.email) {
+        errors.email = "Email is required.";
+      } else if (!this.isValidEmail(this.email)) {
+        errors.email = "Invalid email format";
+      } else if (this.emailExists(this.email)) {
+        errors.email = "Email already exists";
+      }
+      this.emailError = errors.email || ""; // Set emailError directly
+      return errors; // Return the errors object
+    },
+    validateEditEmail() {
+      if (!this.editEmail) {
+        this.editEmailError = "Email is required.";
+      } else if (!this.isValidEmail(this.editEmail)) {
+        this.editEmailError = "Invalid email format.";
+      } else {
+        this.editEmailError = "";
       }
     },
-    confirmDeleteAgent(id) {
-      this.agentIdToDelete = id;
-      new bootstrap.Modal(
+    handleAddAgent() {
+      // Validate input fields
+      this.validateName(this.name);
+      this.validateService(this.service);
+      this.validateFunction(this.func);
+      const emailErrors = this.validateEmail(); // Call the validation method
+
+      if (
+        this.nameError ||
+        this.serviceError ||
+        this.funcError ||
+        Object.keys(emailErrors).length > 0
+      ) {
+        return;
+      }
+
+      // Reset error messages
+      this.errorAddAgent = "";
+
+      axios
+        .post("http://127.0.0.1:8000/api/agents", {
+          name: this.name,
+          email: this.email,
+          service: this.service,
+          function: this.func,
+        })
+        .then(() => {
+          this.fetchAgents();
+          this.showToast("Agent added successfully!");
+          this.resetAddAgentForm();
+        })
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            this.errorAddAgent = error.response.data.message;
+          } else {
+            this.errorAddAgent = "An error occurred while adding the agent.";
+          }
+        });
+    },
+
+    handleEditAgent() {
+      // Validate input fields
+      this.validateName(this.editName);
+      this.validateService(this.editService);
+      this.validateFunction(this.editFunc);
+      this.validateEditEmail();
+
+      if (
+        this.editNameError ||
+        this.editServiceError ||
+        this.editFuncError ||
+        this.editEmailError
+      ) {
+        return;
+      }
+
+      // Reset error messages
+      this.errorEditAgent = "";
+
+      axios
+        .put(`http://127.0.0.1:8000/api/agents/${this.editAgentId}`, {
+          name: this.editName,
+          email: this.editEmail,
+          service: this.editService,
+          function: this.editFunc,
+        })
+        .then(() => {
+          this.showToast("Agent updated successfully!");
+          this.fetchAgents();
+          this.resetEditAgentForm();
+        })
+        .catch((error) => {
+          if (error.response && error.response.data) {
+            this.errorEditAgent = error.response.data.message;
+          } else {
+            this.errorEditAgent = "An error occurred while updating the agent.";
+          }
+        });
+    },
+    showEditAgentModal(agent) {
+      this.editName = agent.name;
+      this.editEmail = agent.email;
+      this.editService = agent.service;
+      this.editFunc = agent.function;
+      this.editAgentId = agent.id;
+
+      const editAgentModal = new bootstrap.Modal(
+        document.getElementById("editAgentModal")
+      );
+      editAgentModal.show();
+    },
+    showDeleteConfirmationModal(agentId) {
+      this.deleteAgentId = agentId;
+      const deleteConfirmationModal = new bootstrap.Modal(
         document.getElementById("deleteConfirmationModal")
-      ).show();
+      );
+      deleteConfirmationModal.show();
     },
-    async confirmDelete() {
-      if (this.agentIdToDelete !== null) {
-        try {
-          await axios.delete(
-            `http://127.0.0.1:8000/api/agents/${this.agentIdToDelete}`
+    deleteAgent() {
+      axios
+        .delete(`http://127.0.0.1:8000/api/agents/${this.deleteAgentId}`)
+        .then(() => {
+          this.agents = this.agents.filter(
+            (agent) => agent.id !== this.deleteAgentId
           );
-          this.agentIdToDelete = null;
-          this.errorDeleteAgent = "";
-          this.getAgents();
-          this.showSuccessToast("Agent deleted successfully!");
-          this.hideDeleteConfirmationModal();
-        } catch (error) {
-          this.errorDeleteAgent = "Failed to delete agent";
-          console.log(error);
-        }
-      }
+          this.showToast("Agent deleted successfully!");
+          this.deleteAgentId = null;
+          const deleteConfirmationModal = bootstrap.Modal.getInstance(
+            document.getElementById("deleteConfirmationModal")
+          );
+          deleteConfirmationModal.hide();
+        })
+        .catch((error) => {
+          console.error("Error deleting agent:", error);
+        });
     },
-    hideDeleteConfirmationModal() {
-      const modal = document.getElementById("deleteConfirmationModal");
-      const modalInstance = bootstrap.Modal.getInstance(modal);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
-    },
-    async handleAddAgent(event) {
-      event.preventDefault();
-      try {
-        if (this.validateForm()) {
-          await axios.post("http://127.0.0.1:8000/api/agents", {
-            name: this.name,
-            email: this.email,
-            service: this.service,
-            function: this.func,
-          });
-
-          this.name = "";
-          this.email = "";
-          this.service = "";
-          this.func = "";
-          this.errorAddAgent = "";
-
-          this.getAgents();
-          this.showSuccessToast("Agent added successfully!");
-          // this.hideAddAgentModal();
-        }
-      } catch (error) {
-        this.errorAddAgent = error.response
-          ? error.response.data.message
-          : "Failed to add agent";
-        console.log(error);
-      }
-    },
-    hideAddAgentModal() {
-      const modal = document.getElementById("addAgentModal");
-      const modalInstance = bootstrap.Modal.getInstance(modal);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
-    },
-    validateForm() {
+    resetAddAgentForm() {
+      this.name = "";
+      this.email = "";
+      this.service = "";
+      this.func = "";
       this.nameError = "";
       this.emailError = "";
       this.serviceError = "";
       this.funcError = "";
-
-      if (!this.name) {
-        this.nameError = "Name is required";
-      }
-
-      if (!this.email) {
-        this.emailError = "Email is required";
-      } else if (!this.isValidEmail(this.email)) {
-        this.emailError = "Invalid email format";
-      } else if (this.emailExists(this.email)) {
-        this.emailError = "Email already exists in the list";
-      }
-
-      if (!this.service) {
-        this.serviceError = "Service is required";
-      }
-
-      if (!this.func) {
-        this.funcError = "Function is required";
-      }
-
-      return (
-        !this.nameError &&
-        !this.emailError &&
-        !this.serviceError &&
-        !this.funcError
+      this.errorAddAgent = "";
+      const addAgentModal = bootstrap.Modal.getInstance(
+        document.getElementById("addAgentModal")
       );
+      addAgentModal.hide();
+    },
+    resetEditAgentForm() {
+      this.editName = "";
+      this.editEmail = "";
+      this.editService = "";
+      this.editFunc = "";
+      this.editAgentId = null;
+      this.errorEditAgent = "";
+      const editAgentModal = bootstrap.Modal.getInstance(
+        document.getElementById("editAgentModal")
+      );
+      editAgentModal.hide();
+    },
+    showToast(message) {
+      this.toastMessage = message;
+      const toast = new bootstrap.Toast(document.getElementById("liveToast"));
+      toast.show();
+    },
+    closeToast() {
+      this.showSuccessToast = false;
     },
     emailExists(email) {
       return this.agents.some((agent) => agent.email === email);
@@ -497,44 +713,53 @@ export default {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
+    validateName(name) {
+      if (!name) {
+        this.nameError = "Name is required.";
+      } else {
+        this.nameError = "";
       }
     },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
+    validateService(service) {
+      if (!service) {
+        this.serviceError = "Service is required.";
+      } else {
+        this.serviceError = "";
       }
     },
-    changePage(page) {
-      this.currentPage = page;
-    },
-    showSuccessToast(message) {
-      this.toastMessage = message;
-      this.showToast = true;
-      setTimeout(() => {
-        this.showToast = false;
-      }, 3000);
-    },
-    closeToast() {
-      this.showToast = false;
+    validateFunction(func) {
+      if (!func) {
+        this.funcError = "Function is required.";
+      } else {
+        this.funcError = "";
+      }
     },
   },
+  mounted() {
+    this.fetchAgents();
+  },
   watch: {
-    email(newEmail) {
-      if (newEmail && !this.isValidEmail(newEmail)) {
-        this.emailError = "Invalid email format";
-      } else {
-        this.emailError = "";
-      }
+    name(newName) {
+      this.validateName(newName);
+    },
+    service(newService) {
+      this.validateService(newService);
+    },
+    func(newFunc) {
+      this.validateFunction(newFunc);
+    },
+    email() {
+      this.validateEmail(); // Call the validation method
+    },
+    editEmail() {
+      this.validateEditEmail();
     },
   },
 };
 </script>
 
-<style scoped>
-.is-invalid {
-  border-color: #dc3545;
+<style>
+.modal-footer .btn + .btn {
+  margin-left: 0.5rem;
 }
 </style>
