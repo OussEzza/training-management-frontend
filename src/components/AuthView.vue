@@ -1,7 +1,7 @@
 <template>
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
+  <div class="container mt-5 d-flex justify-content-center">
+    <div class="card shadow-sm" style="width: 100%; max-width: 500px;">
+      <div class="card-body">
         <img
           src="../assets/logo.png"
           alt="Login Image"
@@ -11,37 +11,37 @@
         <h1 class="text-center mb-4">Login</h1>
         <form @submit.prevent="login">
           <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label"
-              >Email address</label
-            >
+            <label for="email" class="form-label">Email address</label>
             <input
               type="email"
               class="form-control"
-              id="exampleInputEmail1"
+              id="email"
               aria-describedby="emailHelp"
               v-model="loginData.email"
+              :class="{ 'is-invalid': errors.email }"
               @input="clearError('email')"
+              required
             />
             <div v-if="errors.email" class="invalid-feedback d-block">
               {{ errors.email }}
             </div>
           </div>
           <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label"
-              >Password</label
-            >
+            <label for="password" class="form-label">Password</label>
             <input
               type="password"
               class="form-control"
-              id="exampleInputPassword1"
+              id="password"
               v-model="loginData.password"
+              :class="{ 'is-invalid': errors.password }"
               @input="clearError('password')"
+              required
             />
             <div v-if="errors.password" class="invalid-feedback d-block">
               {{ errors.password }}
             </div>
           </div>
-          <div class="text-center">
+          <div class="d-grid">
             <button type="submit" class="btn btn-primary">Login</button>
           </div>
         </form>
@@ -121,3 +121,30 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.card {
+  border-radius: 10px;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+.img-fluid {
+  max-height: 200px;
+}
+</style>

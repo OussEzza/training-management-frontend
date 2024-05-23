@@ -1,7 +1,15 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <router-link class="navbar-brand text-light" to="/">Navbar</router-link>
+      <router-link class="navbar-brand" to="/">
+        <img
+          src="../assets/logo.png"
+          alt="OCP logo"
+          class="navbar-logo d-inline-block align-top"
+          style="width: 30px;"
+        />
+        <span class="text-light">OCP</span>
+      </router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -66,11 +74,11 @@
                   width="16"
                   height="16"
                   fill="currentColor"
-                  class="bi bi-bell"
+                  class="bi bi-bell-fill"
                   viewBox="0 0 16 16"
                 >
                   <path
-                    d="M8 16a1.5 1.5 0 0 0 1.5-1.5h-3A1.5 1.5 0 0 0 8 16zm7-9V7c0 3.066-2.214 5.629-5.068 6.143a.75.75 0 0 0 .136.248l.522.522H5.41l.522-.522a.75.75 0 0 0 .136-.248C2.214 12.629 0 10.066 0 7V7l1-.001A7 7 0 0 1 8 .999zm-7-2a1 1 0 0 0-1 1v1c0 2.325 1.791 4.243 4.097 4.472.251.854.957 1.528 1.903 1.528s1.652-.674 1.903-1.528C14.209 5.243 16 3.325 16 1V0h-1v1c0 1.518-1.109 2.782-2.561 2.97a3.25 3.25 0 0 1-6.878 0C2.109 3.782 1 2.518 1 1V0H0v1a1 1 0 0 0 1 1z"
+                    d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2m.995-14.901a1 1 0 1 0-1.99 0A5 5 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901"
                   />
                 </svg>
                 <span class="badge bg-danger">{{
@@ -148,10 +156,23 @@
         </ul>
         <button type="button" @click="logout" class="btn btn-danger">
           Logout
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
-  <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
-</svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-box-arrow-right"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"
+            />
+            <path
+              fill-rule="evenodd"
+              d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"
+            />
+          </svg>
         </button>
       </div>
     </div>
@@ -234,6 +255,7 @@ export default {
             `http://127.0.0.1:8000/api/trainings/${training.training_id}`
           );
 
+          console.log(this.expiringInDays)
           // Get the start date of the training
           const startDate = new Date(training.date_to);
 
@@ -256,7 +278,7 @@ export default {
           const expiryDate = new Date(
             startDate.getTime() + durationInDays * 24 * 60 * 60 * 1000
           );
-          console.log("Expir date: " + expiryDate);
+          console.log("Expir date for training : " + response.data.training.name + " is : " + expiryDate);
           // Calculate the difference in days between expiry date and today's date
           const diffInDays = Math.floor(
             (expiryDate - today) / (1000 * 60 * 60 * 24)

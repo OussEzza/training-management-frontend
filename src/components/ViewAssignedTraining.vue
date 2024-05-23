@@ -10,8 +10,9 @@
             <th scope="col">Training</th>
             <th scope="col">Service</th>
             <th scope="col">Function</th>
-            <th scope="col">Date</th>
-          </tr>
+            <th scope="col">Start date</th>
+              <th scope="col">End date</th>
+                      </tr>
         </thead>
         <tbody>
           <tr v-for="(record, index) in agent_training" :key="record.id">
@@ -20,7 +21,8 @@
             <td>{{ getTrainingName(record.training_id) }}</td>
             <td>{{ getTrainingDuration(record.training_id) }}</td>
             <td>{{ getTrainingCategory(record.training_id) }}</td>
-            <td>{{ record.date }}</td>
+            <td>{{ record.date_from }}</td>
+            <td>{{ record.date_to }}</td>
           </tr>
         </tbody>
       </table>

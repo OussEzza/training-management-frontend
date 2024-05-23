@@ -138,8 +138,8 @@
             <tr>
               <th>Agent</th>
               <th>Training</th>
-              <th>Date from</th>
-              <th>Date to</th>
+              <th>Start date</th>
+              <th>End date</th>
             </tr>
           </thead>
           <tbody>

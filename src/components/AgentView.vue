@@ -464,7 +464,7 @@ export default {
     return {
       agents: [],
       currentPage: 1,
-      itemsPerPage: 2,
+      itemsPerPage: 10,
       searchName: "",
       searchService: "",
       searchFunction: "",
@@ -739,19 +739,19 @@ export default {
     this.fetchAgents();
   },
   watch: {
-    name(newName) {
+    "name"(newName) {
       this.validateName(newName);
     },
-    service(newService) {
+    "service"(newService) {
       this.validateService(newService);
     },
-    func(newFunc) {
+    "func"(newFunc) {
       this.validateFunction(newFunc);
     },
-    email() {
+    "email"() {
       this.validateEmail(); // Call the validation method
     },
-    editEmail() {
+    "editEmail"() {
       this.validateEditEmail();
     },
   },

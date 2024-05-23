@@ -10,7 +10,8 @@
               <th scope="col">Agent</th>
               <th scope="col">Service</th>
               <th scope="col">Function</th>
-              <th scope="col">Date</th>
+              <th scope="col">Start date</th>
+              <th scope="col">End date</th>
             </tr>
           </thead>
           <tbody>
@@ -20,7 +21,8 @@
               <td>{{ getAgentName(record.agent_id) }}</td>
               <td>{{ getAgentService(record.agent_id) }}</td>
               <td>{{ getAgentFunction(record.agent_id) }}</td>
-              <td>{{ record.date }}</td>
+              <td>{{ record.date_from }}</td>
+              <td>{{ record.date_to }}</td>
             </tr>
           </tbody>
         </table>

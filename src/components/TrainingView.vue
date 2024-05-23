@@ -267,23 +267,41 @@
     </div>
 
     <!-- Pagination -->
-    <nav aria-label="Page navigation example" class="m-3">
-      <ul class="pagination justify-content-end">
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center mt-3">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
-          <button class="page-link" @click="prevPage">Previous</button>
+          <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <a
+            class="page-link"
+            href="#"
+            @click.prevent="changePage(currentPage - 1)"
+            >Previous</a
+          >
         </li>
         <li
-          class="page-item"
           v-for="page in totalPages"
           :key="page"
-          :class="{ active: page === currentPage }"
+          class="page-item"
+          :class="{ active: currentPage === page }"
         >
-          <button class="page-link" @click="changePage(page)">
-            {{ page }}
-          </button>
+          <a class="page-link" href="#" @click.prevent="changePage(page)">{{
+            page
+          }}</a>
         </li>
         <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-          <button class="page-link" @click="nextPage">Next</button>
+          <a
+            class="page-link"
+            href="#"
+            @click.prevent="changePage(currentPage + 1)"
+            >Next</a
+          >
+        </li>
+        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+          <a class="page-link" href="#" @click.prevent="changePage(totalPages)"
+            >Last</a
+          >
         </li>
       </ul>
     </nav>
@@ -416,7 +434,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Success Toast -->
     <div
       class="toast align-items-center bg-success text-white border-0"
@@ -464,7 +482,7 @@ export default {
       },
       Categories: ["Category 1", "Category 2", "Category 3"],
       currentPage: 1,
-      pageSize: 2,
+      pageSize: 10,
       errorGetTrainings: "",
       errorDeleteTraining: "",
       errorAddTraining: "",
@@ -631,7 +649,7 @@ export default {
         duration: training.duration,
         durationFormat: training.duration_unit,
         category: training.category,
-      }
+      };
       this.showEditModal = true;
     },
     hideEditTrainingModal() {
