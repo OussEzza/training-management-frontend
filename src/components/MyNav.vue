@@ -91,6 +91,17 @@
                       min="1"
                     />
                     <span> days</span>
+                    <div class="dropdown-item-text">
+                      <input
+                        type="checkbox"
+                        id="showAllTrainings"
+                        v-model="showAllTrainings"
+                        @change="showExpiringTrainingsAlert"
+                      />
+                      <label for="showAllTrainings"
+                        >Show also expired trainings</label
+                      >
+                    </div>
                   </div>
                 </li>
                 <li v-if="expiringTrainings.length > 0">
@@ -99,20 +110,35 @@
                     v-for="(agentTraining, index) in expiringTrainings"
                     :key="index"
                     type="button"
-                    class="dropdown-item"
+                    class="dropdown-item bg-warning text-dark"
                     @click="redirectToTraining(agentTraining)"
                   >
-                    <span v-if="getAgentName(agentTraining.agent_id)">{{
+                    <!-- Display agent name, training name, date, and status with Bootstrap styles -->
+                    The agent
+                    <span class="fw-bold text-primary">{{
                       getAgentName(agentTraining.agent_id)
                     }}</span>
-                    -
-                    <span v-if="getTrainingName(agentTraining.training_id)">{{
+                    is undergoing training
+                    <span class="fw-bold text-success">{{
                       getTrainingName(agentTraining.training_id)
                     }}</span>
-                    -
-                    {{ agentTraining.date_to }}
+                    scheduled for
+                    <span class="fst-italic text-muted">{{
+                      agentTraining.date_to
+                    }}</span
+                    >. This training has
+                    <span
+                      v-if="agentTraining.expired === 1"
+                      class="badge bg-danger"
+                    >
+                      expired.
+                    </span>
+                    <span v-else class="badge bg-success">
+                      not expired yet.
+                    </span>
                   </button>
                 </li>
+
                 <li v-else>
                   <span class="dropdown-item-text">No expiring trainings</span>
                 </li>
@@ -122,6 +148,10 @@
         </ul>
         <button type="button" @click="logout" class="btn btn-danger">
           Logout
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+  <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+</svg>
         </button>
       </div>
     </div>
@@ -138,6 +168,7 @@ export default {
       expiringTrainings: [],
       agents: [],
       trainings: [],
+      showAllTrainings: false,
       expiringInDays: 30, // Default value for testing
     };
   },
@@ -232,7 +263,10 @@ export default {
           );
           console.log("diffInDays is ", diffInDays);
           // Check if the training is expiring within the specified period
-          if (diffInDays <= this.expiringInDays && diffInDays > 0) {
+          if (this.showAllTrainings) {
+            if (diffInDays <= this.expiringInDays)
+              this.expiringTrainings.push(training);
+          } else if (diffInDays <= this.expiringInDays && diffInDays > 0) {
             // If yes, push the training to the expiringTrainings array
             this.expiringTrainings.push(training);
           }
@@ -242,24 +276,17 @@ export default {
         }
       }
     },
-
-    // Function to calculate the expiry date based on start date, duration, and duration unit
-    // calculateExpiryDate(startDate, duration, durationUnit) {
-    //   const expiryDate = new Date(startDate);
-    //   console.log("Start date", expiryDate);
-
-    //   if (durationUnit === "year") {
-    //     expiryDate.setFullYear(expiryDate.getFullYear() + duration);
-    //   } else if (durationUnit === "month") {
-    //     expiryDate.setMonth(expiryDate.getMonth() + duration);
-    //   } else if (durationUnit === "days") {
-    //     expiryDate.setDate(expiryDate.getDate() + duration);
-    //   }
-    //   console.log("Expired in : ",expiryDate);
-
-    //   return expiryDate;
-    // },
-
+    async updateExpiredStatus() {
+      // Assuming you're calling this function in response to a user action
+      axios
+        .post("http://127.0.0.1:8000/api/update-expired-status")
+        .then((response) => {
+          console.log(response.data.message);
+        })
+        .catch((error) => {
+          console.error("Error updating expired status:", error);
+        });
+    },
     getAgentName(agentId) {
       const agent = this.agents.find((agent) => agent.id === agentId);
       return agent ? agent.name : "";
@@ -270,7 +297,6 @@ export default {
       );
       return training ? training.name : "";
     },
-
     redirectToTraining(training) {
       console.log("Redirect to training:", training);
       // Implement the logic to navigate to the training details page
@@ -280,12 +306,7 @@ export default {
     this.getAgentTraining();
     this.getAgents();
     this.getTrainings();
+    this.updateExpiredStatus();
   },
 };
 </script>
-
-<style>
-.navbar-nav .btn-logout {
-  margin-left: 10px;
-}
-</style>
