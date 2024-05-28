@@ -1,6 +1,9 @@
 <template>
   <div class="container mt-4">
     <div class="card">
+      <div class="card-header">
+        <h3>Assign Agents to Trainings</h3>
+      </div>
       <div class="card-body">
         <button class="btn btn-primary" @click="showModal = true">
           Add Agent to Training
@@ -152,6 +155,57 @@
           </tbody>
         </table>
 
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mt-3">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a class="page-link" href="#" @click.prevent="changePage(1)"
+                >First</a
+              >
+            </li>
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(currentPage - 1)"
+                >Previous</a
+              >
+            </li>
+            <li
+              v-for="page in totalPages"
+              :key="page"
+              class="page-item"
+              :class="{ active: currentPage === page }"
+            >
+              <a class="page-link" href="#" @click.prevent="changePage(page)">{{
+                page
+              }}</a>
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(currentPage + 1)"
+                >Next</a
+              >
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <a
+                class="page-link"
+                href="#"
+                @click.prevent="changePage(totalPages)"
+                >Last</a
+              >
+            </li>
+          </ul>
+        </nav>
+
         <!-- Toast component for success message -->
         <div
           class="toast align-items-center bg-success text-white border-0"
@@ -186,6 +240,7 @@
 </template>
 
 <script>
+
 import axios from "axios";
 
 export default {
@@ -204,6 +259,9 @@ export default {
       showToast: false,
       errorAssignAgentToTraining: "",
       messageAssignAgentToTraining: "",
+      currentPage: 1,
+      totalPages: 1,
+      perPage: 10,
     };
   },
   created() {
@@ -230,8 +288,7 @@ export default {
           // Fetch updated data and show success message
           this.getAgentTraining();
           this.showToast = true;
-          this.messageAssignAgentToTraining =
-            "Agent assigned to training successfully";
+          this.messageAssignAgentToTraining = "Agent assigned to training successfully";
           setTimeout(() => {
             this.showToast = false;
           }, 3000);
@@ -242,22 +299,25 @@ export default {
       } catch (error) {
         if (error.response && error.response.status === 422) {
           this.errors = error.response.data.errors;
-          this.errorAssignAgentToTraining =
-            "Validation failed. Please check the input fields.";
+          this.errorAssignAgentToTraining = "Validation failed. Please check the input fields.";
         } else {
           console.error("Error assigning agent to training:", error);
-          this.errorAssignAgentToTraining =
-            "Error assigning agent to training. Please try again later.";
+          this.errorAssignAgentToTraining = "Error assigning agent to training. Please try again later.";
         }
       }
     },
-
     async getAgentTraining() {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/agent-training"
-        );
+        const response = await axios.get("http://127.0.0.1:8000/api/agent-training", {
+          params: {
+            page: this.currentPage,
+            perPage: this.perPage,
+            training_id: this.trainingId || undefined,
+            agent_id: this.agentId || undefined,
+          },
+        });
         this.agent_training = response.data.agent_training;
+        this.totalPages = response.data.total_pages;
       } catch (error) {
         console.error(error);
       }
@@ -306,7 +366,12 @@ export default {
 
       return Object.keys(this.errors).length === 0;
     },
-
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        this.getAgentTraining();
+      }
+    },
     closeToast() {
       this.showToast = false;
     },

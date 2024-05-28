@@ -156,7 +156,7 @@
                 class="form-control"
                 id="inputDuration"
                 v-model="training.duration"
-                placeholder="Enter duration..."
+                placeholder="Enter validity..."
                 :class="{ 'is-invalid': trainingDurationError }"
                 required
               />
@@ -480,7 +480,7 @@ export default {
         durationFormat: "year",
         category: "",
       },
-      Categories: ["Category 1", "Category 2", "Category 3"],
+      Categories: ["IT", "Sales", "Customer Support", "Marketing", "HR", "Finance", "Operations"],
       currentPage: 1,
       pageSize: 10,
       errorGetTrainings: "",

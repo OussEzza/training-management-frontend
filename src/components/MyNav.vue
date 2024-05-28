@@ -114,12 +114,10 @@
                 </li>
                 <li v-if="expiringTrainings.length > 0">
                   <h6 class="dropdown-header">Expiring Trainings</h6>
-                  <button
+                  <label
                     v-for="(agentTraining, index) in expiringTrainings"
                     :key="index"
-                    type="button"
                     class="dropdown-item bg-warning text-dark"
-                    @click="redirectToTraining(agentTraining)"
                   >
                     <!-- Display agent name, training name, date, and status with Bootstrap styles -->
                     The agent
@@ -144,7 +142,7 @@
                     <span v-else class="badge bg-success">
                       not expired yet.
                     </span>
-                  </button>
+                  </label>
                 </li>
 
                 <li v-else>

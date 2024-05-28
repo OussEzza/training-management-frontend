@@ -196,7 +196,7 @@
                       Close
                     </button>
                     <button type="submit" class="btn btn-primary">
-                      Save changes
+                      Add Agent
                     </button>
                   </div>
                 </form>
@@ -623,8 +623,8 @@ export default {
         })
         .then(() => {
           this.showToast("Agent updated successfully!");
-          this.fetchAgents();
           this.resetEditAgentForm();
+          this.fetchAgents();
         })
         .catch((error) => {
           if (error.response && error.response.data) {
@@ -739,15 +739,15 @@ export default {
     this.fetchAgents();
   },
   watch: {
-    "name"(newName) {
-      this.validateName(newName);
-    },
-    "service"(newService) {
-      this.validateService(newService);
-    },
-    "func"(newFunc) {
-      this.validateFunction(newFunc);
-    },
+    // "name"(newName) {
+    //   this.validateName(newName);
+    // },
+    // "service"(newService) {
+    //   this.validateService(newService);
+    // },
+    // "func"(newFunc) {
+    //   this.validateFunction(newFunc);
+    // },
     "email"() {
       this.validateEmail(); // Call the validation method
     },
