@@ -1,16 +1,24 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import Index from "./components/TrainingView.vue";
-import Edit from "./components/EditTraining.vue";
 import Register from "./components/RegisterView.vue";
 import Login from "./components/AuthView.vue";
 import DashBoard from "./components/DashBoard.vue";
 import IndexAgent from "./components/AgentView.vue";
-import EditAgent from "./components/EditAgent.vue";
 import ViewAssignedAgent from "./components/ViewAssignedAgent.vue";
 import ViewAssignedTraining from "./components/ViewAssignedTraining.vue";
 import AssignAgentToTraining from "./components/AssignAgentToTraining.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
+// Set default options
+const options = {
+  position: 'top-right',
+  timeout: 3000,
+  transition: 'Vue-Toastification__fade',
+  // Add any other default options you want to set
+};
 
 const routes = [
   {
@@ -36,12 +44,6 @@ const routes = [
     meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
   {
-    name: "Edit",
-    path: "/trainings/edit/:id",
-    component: Edit,
-    meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
-  },
-  {
     name: "ViewAssignedAgent",
     path: "/trainings/view/:id",
     component: ViewAssignedAgent,
@@ -57,12 +59,6 @@ const routes = [
     name: "IndexAgent",
     path: "/agents",
     component: IndexAgent,
-    meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
-  },
-  {
-    name: "EditAgent",
-    path: "/agents/edit/:id",
-    component: EditAgent,
     meta: { requiresAuth: true }, // Add meta field to indicate authentication requirement
   },
   {
@@ -96,4 +92,4 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-createApp(App).use(router).mount("#app");
+createApp(App).use(router).use(Toast, options).mount("#app"); // Separate .use() calls
