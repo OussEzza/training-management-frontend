@@ -90,6 +90,14 @@
               </tr>
             </tbody>
           </table>
+          <!-- Error Alerts -->
+          <div
+            v-if="errorGetAgents"
+            class="alert alert-danger mt-3"
+            role="alert"
+          >
+            {{ errorGetAgents }}
+          </div>
         </div>
 
         <!-- Add New Agent Button -->
@@ -490,6 +498,7 @@ export default {
       deleteAgentId: null,
       toastMessage: "",
       showSuccessToast: false,
+      errorGetAgents: "",
     };
   },
   computed: {
@@ -527,10 +536,16 @@ export default {
   },
   methods: {
     fetchAgents() {
-      axios.get("http://127.0.0.1:8000/api/agents").then((response) => {
-        this.agents = response.data.agents;
-      });
-    },
+  axios.get("http://127.0.0.1:8000/api/agents")
+    .then((response) => {
+      this.agents = response.data.agents;
+    })
+    .catch((error) => {
+      this.errorGetAgents = "Failed to retrieve agents.";
+      console.error("Error fetching agents:", error); // Log the error for debugging
+    });
+},
+
     changePage(page) {
       this.currentPage = page;
     },
@@ -748,10 +763,10 @@ export default {
     // "func"(newFunc) {
     //   this.validateFunction(newFunc);
     // },
-    "email"() {
+    email() {
       this.validateEmail(); // Call the validation method
     },
-    "editEmail"() {
+    editEmail() {
       this.validateEditEmail();
     },
   },

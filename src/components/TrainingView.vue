@@ -96,6 +96,10 @@
           </tr>
         </tbody>
       </table>
+      <!-- Error Alerts -->
+    <div v-if="errorGetTrainings" class="alert alert-danger mt-3" role="alert">
+      {{ errorGetTrainings }}
+    </div>
     </div>
     <div class="text-end mt-3">
       <button
@@ -306,10 +310,7 @@
       </ul>
     </nav>
 
-    <!-- Error Alerts -->
-    <div v-if="errorGetTrainings" class="alert alert-danger mt-3" role="alert">
-      {{ errorGetTrainings }}
-    </div>
+    
     <div
       v-if="errorDeleteTraining"
       class="alert alert-danger mt-3"
