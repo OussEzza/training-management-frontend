@@ -17,14 +17,14 @@
         </div>
         <div class="mb-3">
           <label for="searchTrainingDuration" class="form-label"
-            >Search Training by Duration:</label
+            >Search Training by Validity:</label
           >
           <input
             type="text"
             class="form-control"
             id="searchTrainingDuration"
             v-model="searchDuration"
-            placeholder="Enter training duration..."
+            placeholder="Enter training validity..."
           />
         </div>
         <div class="mb-3">
