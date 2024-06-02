@@ -536,18 +536,39 @@ export default {
   },
   methods: {
     fetchAgents() {
-  axios.get("http://127.0.0.1:8000/api/agents")
-    .then((response) => {
-      this.agents = response.data.agents;
-    })
-    .catch((error) => {
-      this.errorGetAgents = "Failed to retrieve agents.";
-      console.error("Error fetching agents:", error); // Log the error for debugging
-    });
-},
+      axios
+        .get("http://127.0.0.1:8000/api/agents")
+        .then((response) => {
+          this.agents = response.data.agents;
+        })
+        .catch((error) => {
+          this.errorGetAgents = "Failed to retrieve agents.";
+          console.error("Error fetching agents:", error); // Log the error for debugging
+        });
+    },
 
     changePage(page) {
       this.currentPage = page;
+    },
+    validateEmail1(email) {
+      if (!email) {
+        this.emailError = "Email is required.";
+      } else if (!this.isValidEmail(email)) {
+        this.emailError = "Invalid email format";
+      } else if (this.emailExists(email)) {
+        this.emailError = "Email already exists";
+      } else {
+        this.emailError = "";
+      }
+    },
+    validateEditEmail1(email) {
+      if (!email) {
+        this.editEmailError = "Email is required.";
+      } else if (!this.isValidEmail(email)) {
+        this.editEmailError = "Invalid email format";
+      } else {
+        this.editEmailError = "";
+      }
     },
     validateEmail() {
       const errors = {};
@@ -575,13 +596,13 @@ export default {
       this.validateName(this.name);
       this.validateService(this.service);
       this.validateFunction(this.func);
-      const emailErrors = this.validateEmail(); // Call the validation method
+      this.validateEmail1(this.email); // Call the validation method
 
       if (
         this.nameError ||
         this.serviceError ||
         this.funcError ||
-        Object.keys(emailErrors).length > 0
+        this.emailError
       ) {
         return;
       }
@@ -615,7 +636,7 @@ export default {
       this.validateName(this.editName);
       this.validateService(this.editService);
       this.validateFunction(this.editFunc);
-      this.validateEditEmail();
+      this.validateEditEmail1(this.editEmail);
 
       if (
         this.editNameError ||
@@ -763,12 +784,12 @@ export default {
     // "func"(newFunc) {
     //   this.validateFunction(newFunc);
     // },
-    email() {
-      this.validateEmail(); // Call the validation method
-    },
-    editEmail() {
-      this.validateEditEmail();
-    },
+    // email() {
+    //   this.validateEmail1(); // Call the validation method
+    // },
+    // editEmail() {
+    //   this.validateEditEmail1();
+    // },
   },
 };
 </script>
