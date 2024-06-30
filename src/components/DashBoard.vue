@@ -74,12 +74,14 @@ export default {
 
         const agentTrainingResponse = await axios.get("http://127.0.0.1:8000/api/agent-training");
         const agentTrainings = agentTrainingResponse.data.agent_training;
-        this.agentTrainingCount = agentTrainings.length;
 
         // Use a set to track unique agents who have training
         const agentsWithTraining = new Set();
         agentTrainings.forEach(at => agentsWithTraining.add(at.agent_id));
         
+        // Set the count of unique agents in training
+        this.agentTrainingCount = agentsWithTraining.size;
+
         // Calculate agents without training
         this.agentWithoutTrainingCount = this.agentCount - agentsWithTraining.size;
       } catch (error) {
